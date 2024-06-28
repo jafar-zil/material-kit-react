@@ -9,6 +9,13 @@ import TableBody from '@mui/material/TableBody';
 import Typography from '@mui/material/Typography';
 import TableContainer from '@mui/material/TableContainer';
 import TablePagination from '@mui/material/TablePagination';
+import Dialog from '@mui/material/Dialog';
+import DialogActions from '@mui/material/DialogActions';
+import DialogContent from '@mui/material/DialogContent';
+import DialogContentText from '@mui/material/DialogContentText';
+import DialogTitle from '@mui/material/DialogTitle';
+import TextField from '@mui/material/TextField';
+import Autocomplete from '@mui/material/Autocomplete';
 
 import { users } from 'src/_mock/user';
 
@@ -22,20 +29,24 @@ import TableEmptyRows from '../table-empty-rows';
 import UserTableToolbar from '../user-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
+// Dummy role options
+const roles = [
+  { title: 'Admin' },
+  { title: 'User' },
+  { title: 'Manager' },
+  { title: 'Guest' },
+];
+
 // ----------------------------------------------------------------------
 
 export default function UserPage() {
   const [page, setPage] = useState(0);
-
   const [order, setOrder] = useState('asc');
-
   const [selected, setSelected] = useState([]);
-
   const [orderBy, setOrderBy] = useState('name');
-
   const [filterName, setFilterName] = useState('');
-
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [open, setOpen] = useState(false);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -94,12 +105,20 @@ export default function UserPage() {
 
   const notFound = !dataFiltered.length && !!filterName;
 
+  const handleClickOpen = () => {
+    setOpen(true);
+  };
+
+  const handleClose = () => {
+    setOpen(false);
+  };
+
   return (
     <Container>
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Users</Typography>
 
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />}>
+        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickOpen}>
           New User
         </Button>
       </Stack>
@@ -168,6 +187,47 @@ export default function UserPage() {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
+
+      <Dialog open={open} onClose={handleClose}>
+        <DialogTitle>New User</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Enter the details of the new user.
+          </DialogContentText>
+          <TextField
+            autoFocus
+            margin="dense"
+            id="name"
+            label="Name"
+            type="text"
+            fullWidth
+            variant="standard"
+          />
+          <TextField
+            margin="dense"
+            id="company"
+            label="Company"
+            type="text"
+            fullWidth
+            variant="standard"
+          />
+          <Autocomplete
+            options={roles}
+            getOptionLabel={(option) => option.title}
+            renderInput={(params) => (
+              <TextField {...params} margin="dense" label="Role" type="text" fullWidth variant="standard" />
+            )}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleClose} variant="outlined" color="secondary">
+            Cancel
+          </Button>
+          <Button onClick={handleClose} variant="contained" color="primary">
+            Add User
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Container>
   );
 }

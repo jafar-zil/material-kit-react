@@ -1,4 +1,4 @@
-const BASE_URL = "http://127.0.0.1:3456";
+const BASE_URL = "https://cashflow.botire.in";
 
 const handleResponse = async (response) => {
     if (!response.ok) {

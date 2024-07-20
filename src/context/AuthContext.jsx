@@ -1,17 +1,14 @@
-import React, { createContext, useContext, useState, useEffect, useMemo } from 'react';
+import React, { createContext, useContext, useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [authenticated, setAuthenticated] = useState(false);
-
-  useEffect(() => {
+  // Initialize authenticated state based on localStorage
+  const [authenticated, setAuthenticated] = useState(() => {
     const token = localStorage.getItem('authToken');
-    if (token) {
-      setAuthenticated(true);
-    }
-  }, []);
+    return Boolean(token);
+  });
 
   const login = (token) => {
     localStorage.setItem('authToken', token);
@@ -23,11 +20,14 @@ export function AuthProvider({ children }) {
     setAuthenticated(false);
   };
 
-  const contextValue = useMemo(() => ({
-    authenticated,
-    login,
-    logout
-  }), [authenticated]);
+  const contextValue = useMemo(
+    () => ({
+      authenticated,
+      login,
+      logout
+    }),
+    [authenticated]
+  );
 
   return (
     <AuthContext.Provider value={contextValue}>
@@ -37,7 +37,7 @@ export function AuthProvider({ children }) {
 }
 
 AuthProvider.propTypes = {
-  children: PropTypes.node.isRequired
+  children: PropTypes.node.isRequired,
 };
 
 export function useAuth() {

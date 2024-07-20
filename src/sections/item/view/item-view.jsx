@@ -138,7 +138,7 @@ export default function ItemPage() {
 
         <Scrollbar>
           <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 800 }}>
+            <Table sx={{ minWidth: 300 }}>
               <ItemTableHead
                 order={order}
                 orderBy={orderBy}

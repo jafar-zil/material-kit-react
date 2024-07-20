@@ -31,11 +31,18 @@ import { emptyRows, applyFilter, getComparator } from '../utils';
 
 // Dummy role options
 const roles = [
-  { title: 'Admin' },
-  { title: 'User' },
-  { title: 'Manager' },
-  { title: 'Guest' },
+  { title: 'Leader' },
+  { title: 'Hr Manager' },
+  { title: 'UI Designer' },
+  { title: 'UX Designer' },
+  { title: 'UI/UX Designer' },
+  { title: 'Project Manager' },
+  { title: 'Backend Developer' },
+  { title: 'Full Stack Designer' },
+  { title: 'Front End Developer' },
+  { title: 'Full Stack Developer' },
 ];
+
 
 // ----------------------------------------------------------------------
 
@@ -195,7 +202,6 @@ export default function UserPage() {
             Enter the details of the new user.
           </DialogContentText>
           <TextField
-            autoFocus
             margin="dense"
             id="name"
             label="Name"

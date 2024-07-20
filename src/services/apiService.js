@@ -1,4 +1,5 @@
 const BASE_URL = "https://cashflow.botire.in";
+const token = localStorage.getItem('authToken');
 
 const handleResponse = async (response) => {
     if (!response.ok) {
@@ -17,3 +18,13 @@ const handleResponse = async (response) => {
       },
       body: JSON.stringify({ email, password }),
     }).then(handleResponse);
+
+    export const fetchItems = () =>
+      fetch(`${BASE_URL}/api/item`, {
+        method: 'GET',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+           'Authorization': `Bearer ${token}`
+        },
+      }).then(handleResponse);

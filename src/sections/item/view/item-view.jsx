@@ -17,6 +17,10 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
+import FormControl from '@mui/material/FormControl';   // New import
+import InputLabel from '@mui/material/InputLabel';     // New import
+import Select from '@mui/material/Select';             // New import
+import MenuItem from '@mui/material/MenuItem';         // New import
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import TableNoData from '../table-no-data';
@@ -35,6 +39,8 @@ export default function ItemPage() {
   const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [open, setOpen] = useState(false);
+  const [itemName, setName] = useState('');
+  const [type, setType] = useState('');
 
   // Fetch items from the API
   useEffect(() => {
@@ -113,6 +119,20 @@ export default function ItemPage() {
 
   const handleClose = () => {
     setOpen(false);
+  };
+  const handleNameChange = (event) => {
+    setName(event.target.value);
+  };
+
+  const handleTypeChange = (event) => {
+    setType(event.target.value);
+  };
+
+  const handleAddItem = () => {
+    // Handle the logic for adding the item
+    console.log('Name:', itemName);
+    console.log('Type:', type);
+    handleClose();
   };
 
   return (
@@ -200,22 +220,28 @@ export default function ItemPage() {
             type="text"
             fullWidth
             variant="standard"
+            value={itemName}
+            onChange={handleNameChange}
           />
-          <TextField
-            margin="dense"
-            id="type"
-            label="Type"
-            type="text"
-            fullWidth
-            variant="standard"
-          />
-         
+          <FormControl fullWidth margin="dense" variant="standard">
+            <InputLabel id="type-label">Type</InputLabel>
+            <Select
+              labelId="type-label"
+              id="type"
+              value={type}
+              onChange={handleTypeChange}
+              label="Type"
+            >
+              <MenuItem value={1}>Income</MenuItem>
+              <MenuItem value={2}>Expense</MenuItem>
+            </Select>
+          </FormControl>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} variant="outlined" color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleClose} variant="contained" color="primary">
+          <Button onClick={handleAddItem} variant="contained" color="primary">
             Add Item
           </Button>
         </DialogActions>

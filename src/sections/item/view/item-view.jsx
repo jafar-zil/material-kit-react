@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { fetchItems } from 'src/services/apiService'; // Import your API service function
+import { fetchItems, addItem } from 'src/services/apiService'; // Import your API service function
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -14,13 +14,16 @@ import TablePagination from '@mui/material/TablePagination';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-import DialogContentText from '@mui/material/DialogContentText';
+// import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';   // New import
-import InputLabel from '@mui/material/InputLabel';     // New import
-import Select from '@mui/material/Select';             // New import
-import MenuItem from '@mui/material/MenuItem';         // New import
+import FormControl from '@mui/material/FormControl';
+import InputLabel from '@mui/material/InputLabel';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar from '@mui/material/Snackbar';
+import MuiAlert from '@mui/material/Alert';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import TableNoData from '../table-no-data';
@@ -41,19 +44,22 @@ export default function ItemPage() {
   const [open, setOpen] = useState(false);
   const [itemName, setName] = useState('');
   const [type, setType] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [apiError, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
 
   // Fetch items from the API
-  useEffect(() => {
-    const getItems = async () => {
-      try {
-        const data = await fetchItems();
-        setItems(data);
-      } catch (error) {
-        console.error('Failed to fetch items:', error);
-      }
-    };
+  const fetchItemsFromAPI = async () => {
+    try {
+      const data = await fetchItems();
+      setItems(data);
+    } catch (error) {
+      console.error('Failed to fetch items:', error);
+    }
+  };
 
-    getItems();
+  useEffect(() => {
+    fetchItemsFromAPI();
   }, []);
 
   const handleSort = (event, id) => {
@@ -128,11 +134,27 @@ export default function ItemPage() {
     setType(event.target.value);
   };
 
-  const handleAddItem = () => {
-    // Handle the logic for adding the item
-    console.log('Name:', itemName);
-    console.log('Type:', type);
-    handleClose();
+  const handleSuccessClose = () => {
+    setSuccess(false);
+  };
+
+  // Show an error toast
+  const handleErrorClose = () => {
+    setError(null);
+  };
+
+  const handleAddItem = async () => {
+    setLoading(true);
+    try {
+      await addItem(itemName, type);
+      setSuccess(true);
+      handleClose(); // Close the modal on success
+      fetchItemsFromAPI(); // Reload items
+    } catch (err) {
+      setError(err.message || 'An error occurred.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -144,7 +166,12 @@ export default function ItemPage() {
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
         <Typography variant="h4">Items</Typography>
 
-        <Button variant="contained" color="inherit" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickOpen}>
+        <Button
+          variant="contained"
+          color="inherit"
+          startIcon={<Iconify icon="eva:plus-fill" />}
+          onClick={handleClickOpen}
+        >
           New Item
         </Button>
       </Stack>
@@ -210,9 +237,7 @@ export default function ItemPage() {
       <Dialog open={open} onClose={handleClose}>
         <DialogTitle>New Item</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Enter the details of the new item.
-          </DialogContentText>
+          {/* <DialogContentText>Enter the details of the new item.</DialogContentText> */}
           <TextField
             margin="dense"
             id="name"
@@ -241,11 +266,42 @@ export default function ItemPage() {
           <Button onClick={handleClose} variant="outlined" color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleAddItem} variant="contained" color="primary">
+          <Button
+            onClick={handleAddItem}
+            variant="contained"
+            color="primary"
+            disabled={loading}
+            startIcon={loading && <CircularProgress size={20} />}
+          >
             Add Item
           </Button>
         </DialogActions>
       </Dialog>
+      {/* Success Snackbar */}
+      <Snackbar open={success} autoHideDuration={6000} onClose={handleSuccessClose}>
+        <MuiAlert
+          elevation={6}
+          variant="filled"
+          onClose={handleSuccessClose}
+          severity="success"
+        >
+          Item added successfully!
+        </MuiAlert>
+      </Snackbar>
+
+      {/* Error Snackbar */}
+      {apiError && (
+        <Snackbar open={Boolean(apiError)} autoHideDuration={6000} onClose={handleErrorClose}>
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            onClose={handleErrorClose}
+            severity="error"
+          >
+            {apiError}
+          </MuiAlert>
+        </Snackbar>
+      )}
     </Container>
   );
 }

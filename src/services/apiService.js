@@ -19,12 +19,23 @@ const handleResponse = async (response) => {
       body: JSON.stringify({ email, password }),
     }).then(handleResponse);
 
-    export const fetchItems = () =>
-      fetch(`${BASE_URL}/api/item`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-           'Authorization': `Bearer ${token}`
-        },
-      }).then(handleResponse);
+  export const fetchItems = () =>
+    fetch(`${BASE_URL}/api/item`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+    }).then(handleResponse);
+
+    export const addItem = (name, type) =>
+    fetch(`${BASE_URL}/api/item`, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ name, type }),
+    }).then(handleResponse);

@@ -11,17 +11,21 @@ import Popover from '@mui/material/Popover';
 import Iconify from 'src/components/iconify';
 
 ItemTableRow.propTypes = {
-  name: PropTypes.string,
-  type: PropTypes.string,
+  id: PropTypes.number.isRequired, // Add id prop
+  name: PropTypes.string.isRequired,
+  type: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   handleClick: PropTypes.func,
+  onEdit: PropTypes.func.isRequired, // Add onEdit prop
 };
 
 export default function ItemTableRow({
+  id,
   name,
   type,
   selected,
   handleClick,
+  onEdit, // Add onEdit prop
 }) {
   const [openPopover, setOpenPopover] = useState(null);
 
@@ -31,6 +35,11 @@ export default function ItemTableRow({
 
   const handleClosePopover = () => {
     setOpenPopover(null);
+  };
+
+  const handleEdit = () => {
+    handleClosePopover();
+    onEdit(id, name, type); // Pass the id, name, and type to the edit handler
   };
 
   return (
@@ -62,7 +71,7 @@ export default function ItemTableRow({
           sx: { width: 160 },
         }}
       >
-        <MenuItem onClick={handleClosePopover}>
+        <MenuItem onClick={handleEdit}>
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Edit
         </MenuItem>

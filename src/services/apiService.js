@@ -39,3 +39,14 @@ const handleResponse = async (response) => {
       },
       body: JSON.stringify({ name, type }),
     }).then(handleResponse);
+
+    export const editItem = (id,name, type) =>
+    fetch(`${BASE_URL}/api/item`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ id,name, type }),
+    }).then(handleResponse);

@@ -33,7 +33,7 @@ export default function ItemTableToolbar({ numSelected, filterName, onFilterName
         <OutlinedInput
           value={filterName}
           onChange={onFilterName}
-          placeholder="Search user..."
+          placeholder="Search item..."
           startAdornment={
             <InputAdornment position="start">
               <Iconify

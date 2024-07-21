@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { fetchItems, addItem } from 'src/services/apiService'; // Import your API service function
+import { fetchItems, addItem, editItem } from 'src/services/apiService'; // Import your API service functions
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -38,14 +38,16 @@ export default function ItemPage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [selected, setSelected] = useState([]);
-  const [orderBy, setOrderBy] = useState('name');
+  const [orderBy, setOrderBy] = useState('');
   const [filterName, setFilterName] = useState('');
-  const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
-  const [itemName, setName] = useState('');
-  const [type, setType] = useState('');
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [currentItemId, setCurrentItemId] = useState(null);
+  const [itemName, setItemName] = useState(''); // Renamed to avoid conflict
+  const [itemType, setItemType] = useState(''); // Renamed to avoid conflict
   const [loading, setLoading] = useState(false);
-  const [apiError, setError] = useState(null);
+  const [apiError, setApiError] = useState(null); // Renamed to avoid conflict
   const [success, setSuccess] = useState(false);
 
   // Fetch items from the API
@@ -121,17 +123,22 @@ export default function ItemPage() {
 
   const handleClickOpen = () => {
     setOpen(true);
+    setIsEditMode(false); // Set mode to add
+    setItemName(''); // Reset form fields
+    setItemType('');
   };
 
   const handleClose = () => {
     setOpen(false);
+    setCurrentItemId(null);
   };
+
   const handleNameChange = (event) => {
-    setName(event.target.value);
+    setItemName(event.target.value);
   };
 
   const handleTypeChange = (event) => {
-    setType(event.target.value);
+    setItemType(event.target.value);
   };
 
   const handleSuccessClose = () => {
@@ -140,38 +147,65 @@ export default function ItemPage() {
 
   // Show an error toast
   const handleErrorClose = () => {
-    setError(null);
+    setApiError(null);
   };
 
   const handleAddItem = async () => {
     setLoading(true);
+
     try {
-      await addItem(itemName, type);
-      setSuccess(true);
-      handleClose(); // Close the modal on success
-      fetchItemsFromAPI(); // Reload items
-    } catch (err) {
-      setError(err.message || 'An error occurred.');
+      if (isEditMode) {
+        // Edit item mode
+        await editItem(currentItemId, itemName, itemType);
+        setSuccess(true);
+      } else {
+        // Add item mode
+        await addItem(itemName, itemType);
+        setSuccess(true);
+      }
+
+      fetchItemsFromAPI(); // Refresh items list
+      handleClose();
+    } catch (error) {
+      console.error('Failed to add/edit item:', error);
+      setApiError(error.message);
     } finally {
       setLoading(false);
     }
+  };
+  const getButtonLabel = () => {
+    if (loading) {
+      return <CircularProgress size={24} />;
+    }
+    return isEditMode ? 'Update Item' : 'Add Item';
+  };
+
+  // Handle edit initiation
+  const handleEditOpen = (id, name, type) => {
+    setOpen(true);
+    setIsEditMode(true);
+    setCurrentItemId(id);
+    setItemName(name);
+    if(type === "Income"){
+      setItemType(1);
+    }else{
+      setItemType(2);
+    }
+
+    console.log(itemType);
   };
 
   return (
     <Container>
       <Helmet>
-        <title>Items | Cashflow</title>
+        <title> Items | YourAppName </title>
       </Helmet>
 
       <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4">Items</Typography>
-
-        <Button
-          variant="contained"
-          color="inherit"
-          startIcon={<Iconify icon="eva:plus-fill" />}
-          onClick={handleClickOpen}
-        >
+        <Typography variant="h4" gutterBottom>
+          Items
+        </Typography>
+        <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickOpen}>
           New Item
         </Button>
       </Stack>
@@ -184,34 +218,40 @@ export default function ItemPage() {
         />
 
         <Scrollbar>
-          <TableContainer sx={{ overflow: 'unset' }}>
-            <Table sx={{ minWidth: 300 }}>
+          <TableContainer sx={{ minWidth: 300 }}>
+            <Table>
               <ItemTableHead
                 order={order}
                 orderBy={orderBy}
-                rowCount={items.length}
-                numSelected={selected.length}
-                onRequestSort={handleSort}
-                onSelectAllClick={handleSelectAllClick}
                 headLabel={[
-                  { id: 'name', label: 'Name' },
-                  { id: 'type', label: 'Type' },
+                  { id: 'name', label: 'Name', alignRight: false },
+                  { id: 'type', label: 'Type', alignRight: false },
                   { id: '' },
                 ]}
+                rowCount={items.length}
+                numSelected={selected.length}
+                onSelectAllClick={handleSelectAllClick}
+                onRequestSort={handleSort}
               />
               <TableBody>
                 {dataFiltered
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => (
-                    <ItemTableRow
-                      key={row.id}
-                      name={row.name}
-                      type={row.type === '1' ? 'Income' : 'Expense'} // Conditional rendering
-                      selected={selected.indexOf(row.name) !== -1}
-                      handleClick={(event) => handleClick(event, row.name)}
-                    />
-                  ))}
+                  .map((row) => {
+                    const { id, name, type } = row;
+                    const isSelected = selected.indexOf(name) !== -1;
 
+                    return (
+                      <ItemTableRow
+                        key={id}
+                        id={id}
+                        name={name}
+                        type={type === '1' ? 'Income' : 'Expense'} // Conditional rendering
+                        selected={isSelected}
+                        handleClick={(event) => handleClick(event, name)}
+                        onEdit={handleEditOpen} // Pass edit handler
+                      />
+                    );
+                  })}
                 <TableEmptyRows
                   height={77}
                   emptyRows={emptyRows(page, rowsPerPage, items.length)}
@@ -224,20 +264,20 @@ export default function ItemPage() {
         </Scrollbar>
 
         <TablePagination
-          page={page}
+          rowsPerPageOptions={[10, 25, 50]}
           component="div"
           count={items.length}
           rowsPerPage={rowsPerPage}
+          page={page}
           onPageChange={handleChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Card>
 
       <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>New Item</DialogTitle>
+        <DialogTitle>{isEditMode ? 'Edit Item' : 'Add New Item'}</DialogTitle>
         <DialogContent>
-          {/* <DialogContentText>Enter the details of the new item.</DialogContentText> */}
+        
           <TextField
             margin="dense"
             id="name"
@@ -248,32 +288,29 @@ export default function ItemPage() {
             value={itemName}
             onChange={handleNameChange}
           />
-          <FormControl fullWidth margin="dense" variant="standard">
+        <FormControl fullWidth margin="dense" variant="standard">
             <InputLabel id="type-label">Type</InputLabel>
             <Select
               labelId="type-label"
               id="type"
-              value={type}
-              onChange={handleTypeChange}
+              value={itemType}
               label="Type"
+              onChange={handleTypeChange}
             >
-              <MenuItem value={1}>Income</MenuItem>
+               <MenuItem value={1}>Income</MenuItem>
               <MenuItem value={2}>Expense</MenuItem>
             </Select>
           </FormControl>
         </DialogContent>
         <DialogActions>
-          <Button onClick={handleClose} variant="outlined" color="secondary">
-            Cancel
-          </Button>
+          <Button onClick={handleClose}>Cancel</Button>
           <Button
             onClick={handleAddItem}
+            disabled={loading}
             variant="contained"
             color="primary"
-            disabled={loading}
-            startIcon={loading && <CircularProgress size={20} />}
           >
-            Add Item
+            {getButtonLabel()}
           </Button>
         </DialogActions>
       </Dialog>
@@ -285,7 +322,7 @@ export default function ItemPage() {
           onClose={handleSuccessClose}
           severity="success"
         >
-          Item added successfully!
+          Item {isEditMode ? 'updated' : 'added'} successfully!
         </MuiAlert>
       </Snackbar>
 

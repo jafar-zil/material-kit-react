@@ -1,6 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { fetchItems, fetchIncomes, addIncome, editIncome, deleteIncome } from 'src/services/apiService';
+import {
+  fetchItems,
+  fetchIncomes,
+  addIncome,
+  editIncome,
+  deleteIncome,
+} from 'src/services/apiService';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -176,15 +182,15 @@ export default function IncomePage() {
 
   const handleAddIncome = async () => {
     setLoading(true);
-  
+
     try {
       const incomeData = {
-        incomeAmount,
-        incomeDate,
+        amount: incomeAmount, // Updated key
+        date: incomeDate,     // Updated key
         item_id: selectedItem?.id,
-        incomeNote,
+        note: incomeNote,     // Updated key
       };
-  
+
       if (isEditMode) {
         await editIncome(currentIncomeId, incomeData);
         setSuccessMesage('Income updated successfully');
@@ -192,7 +198,7 @@ export default function IncomePage() {
         await addIncome(incomeData);
         setSuccessMesage('Income added successfully');
       }
-  
+
       fetchIncomesFromAPI();
       handleClose();
     } catch (error) {
@@ -202,12 +208,18 @@ export default function IncomePage() {
     }
   };
 
-  const handleEditIncome = (id, date, amount, note ) => {
+  const handleEditIncome = (id, date, amount, note, itemId) => {
     setCurrentIncomeId(id);
     setNote(note);
     setDate(date);
     setAmount(amount);
-   
+  
+    // Convert itemId to number for comparison
+    const itemIdNum = Number(itemId);
+    const itemToSelect = items.find((item) => item.id === itemIdNum);
+  
+    setSelectedItem(itemToSelect || null); // Set the selected item or null if not found
+  
     setIsEditMode(true);
     setOpen(true);
   };
@@ -305,7 +317,7 @@ export default function IncomePage() {
                     dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row) => {
-                        const { id, date, amount, note } = row;
+                        const { id, date, amount, note, item_id } = row;
                         const isIncomeSelected = selected.indexOf(id) !== -1;
 
                         return (
@@ -315,6 +327,7 @@ export default function IncomePage() {
                             date={date}
                             amount={amount}
                             note={note}
+                            itemId={item_id}
                             selected={isIncomeSelected}
                             handleClick={(event) => handleClick(event, id)}
                             onEdit={handleEditIncome}

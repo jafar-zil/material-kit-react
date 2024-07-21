@@ -50,7 +50,7 @@ export default function ItemPage() {
   const [itemType, setItemType] = useState('');
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
-  const [success, setSuccess] = useState(false);
+  const [successMesage, setSuccessMesage] = useState(null);
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const [loadingItems, setLoadingItems] = useState(true);
@@ -150,7 +150,7 @@ export default function ItemPage() {
   };
 
   const handleSuccessClose = () => {
-    setSuccess(false);
+    setSuccessMesage(null);
   };
 
   const handleErrorClose = () => {
@@ -163,10 +163,10 @@ export default function ItemPage() {
     try {
       if (isEditMode) {
         await editItem(currentItemId, itemName, itemType);
-        setSuccess(true);
+        setSuccessMesage("Item updated successfully")
       } else {
         await addItem(itemName, itemType);
-        setSuccess(true);
+        setSuccessMesage("Item added successfully")
       }
 
       fetchItemsFromAPI();
@@ -200,7 +200,7 @@ export default function ItemPage() {
       setLoadingDelete(true); // Set loading state for delete
       try {
         await deleteItem(deleteItemId);
-        setSuccess(true);
+        setSuccessMesage("Item deleted successfully")
         fetchItemsFromAPI();
       } catch (error) {
         setApiError(error.message);
@@ -381,7 +381,7 @@ export default function ItemPage() {
       </Dialog>
 
       <Snackbar
-        open={success}
+         open={Boolean(successMesage)}
         autoHideDuration={3000}
         onClose={handleSuccessClose}
       >
@@ -391,7 +391,7 @@ export default function ItemPage() {
           onClose={handleSuccessClose}
           severity="success"
         >
-            Item {isEditMode ? 'updated' : 'added'} successfully!
+            {successMesage}
         </MuiAlert>
       </Snackbar>
 

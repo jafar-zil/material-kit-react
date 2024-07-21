@@ -40,25 +40,25 @@ const handleResponse = async (response) => {
       body: JSON.stringify({ name, type }),
     }).then(handleResponse);
 
-    export const editItem = (id,name, type) =>
-    fetch(`${BASE_URL}/api/item`, {
+    export const editItem = (id, name, type) =>
+    fetch(`${BASE_URL}/api/item/${id}`, {
       method: 'PUT',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ id,name, type }),
+      body: JSON.stringify({ name, type }),
     }).then(handleResponse);
 
 
     export const deleteItem = (id) =>
-    fetch(`${BASE_URL}/api/item`, {
+    fetch(`${BASE_URL}/api/item/${id}`, {
       method: 'DELETE',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify({ id }),
+      body: null,
     }).then(handleResponse);

@@ -2,7 +2,6 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Stack from '@mui/material/Stack';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -17,8 +16,6 @@ IncomeTableRow.propTypes = {
   note: PropTypes.string,
   itemId: PropTypes.string,
   itemName: PropTypes.string,
-  selected: PropTypes.bool,
-  handleClick: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };
@@ -30,8 +27,6 @@ export default function IncomeTableRow({
   note,
   itemId,
   itemName,
-  selected,
-  handleClick,
   onEdit,
   onDelete,
 }) {
@@ -56,11 +51,8 @@ export default function IncomeTableRow({
   };
 
   return (
-    <TableRow hover selected={selected}>
-      <TableCell padding="checkbox">
-        <Checkbox checked={selected} onChange={handleClick} />
-      </TableCell>
-
+    <TableRow hover>
+    
       <TableCell>
         <Stack direction="row" alignItems="center" spacing={2}>
           <Typography variant="subtitle2">{date}</Typography>

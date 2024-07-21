@@ -36,16 +36,14 @@ import TableNoData from '../table-no-data';
 import IncomeTableRow from '../income-table-row';
 import IncomeTableHead from '../income-table-head';
 import TableEmptyRows from '../table-empty-rows';
-import IncomeTableToolbar from '../income-table-toolbar';
 import { emptyRows, applyFilter, getComparator } from '../utils';
 
 export default function IncomePage() {
   const [incomes, setIncomes] = useState([]);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('');
-  const [filterName, setFilterName] = useState('');
+  const filterName= "";
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -75,6 +73,7 @@ export default function IncomePage() {
     }
   };
 
+
   const fetchItemsFromAPI = async () => {
     const data = await fetchItems();
     setItems(data);
@@ -93,32 +92,9 @@ export default function IncomePage() {
     }
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = incomes.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
+
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -129,10 +105,7 @@ export default function IncomePage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
+
 
   const dataFiltered = applyFilter({
     inputData: incomes,
@@ -272,11 +245,6 @@ export default function IncomePage() {
         </Stack>
 
         <Card>
-          <IncomeTableToolbar
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
-          />
 
           <Scrollbar>
             <TableContainer sx={{ minWidth: 300 }}>
@@ -288,12 +256,9 @@ export default function IncomePage() {
                     { id: 'date', label: 'Date', alignRight: false },
                     { id: 'amount', label: 'Amount', alignRight: false },
                     { id: 'note', label: 'Note', alignRight: false },
-                    { id: 'item.name', label: 'Item', alignRight: false },
+                    { id: 'item_name', label: 'Item', alignRight: false },
                     { id: '' },
                   ]}
-                  rowCount={incomes.length}
-                  numSelected={selected.length}
-                  onSelectAllClick={handleSelectAllClick}
                   onRequestSort={handleSort}
                 />
                 <TableBody>
@@ -318,9 +283,7 @@ export default function IncomePage() {
                     dataFiltered
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row) => {
-                        const { id, date, amount, note, item_id } = row;
-                        const item_name = row.item.name;
-                        const isIncomeSelected = selected.indexOf(id) !== -1;
+                        const { id, date, amount, note, item_id,item_name } = row;
 
                         return (
                           <IncomeTableRow
@@ -331,8 +294,6 @@ export default function IncomePage() {
                             note={note}
                             itemId={item_id}
                             itemName={item_name}
-                            selected={isIncomeSelected}
-                            handleClick={(event) => handleClick(event, id)}
                             onEdit={handleEditIncome}
                             onDelete={handleDeleteIncome}
                           />

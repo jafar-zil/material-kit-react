@@ -288,6 +288,7 @@ export default function IncomePage() {
                     { id: 'date', label: 'Date', alignRight: false },
                     { id: 'amount', label: 'Amount', alignRight: false },
                     { id: 'note', label: 'Note', alignRight: false },
+                    { id: 'item.name', label: 'Item', alignRight: false },
                     { id: '' },
                   ]}
                   rowCount={incomes.length}
@@ -318,6 +319,7 @@ export default function IncomePage() {
                       .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                       .map((row) => {
                         const { id, date, amount, note, item_id } = row;
+                        const item_name = row.item.name;
                         const isIncomeSelected = selected.indexOf(id) !== -1;
 
                         return (
@@ -328,6 +330,7 @@ export default function IncomePage() {
                             amount={amount}
                             note={note}
                             itemId={item_id}
+                            itemName={item_name}
                             selected={isIncomeSelected}
                             handleClick={(event) => handleClick(event, id)}
                             onEdit={handleEditIncome}

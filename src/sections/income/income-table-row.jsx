@@ -15,7 +15,8 @@ IncomeTableRow.propTypes = {
   date: PropTypes.string.isRequired,
   amount: PropTypes.string.isRequired,
   note: PropTypes.string,
-  itemId: PropTypes.string, // Add itemId prop
+  itemId: PropTypes.string,
+  itemName: PropTypes.string,
   selected: PropTypes.bool,
   handleClick: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
@@ -28,6 +29,7 @@ export default function IncomeTableRow({
   amount,
   note,
   itemId,
+  itemName,
   selected,
   handleClick,
   onEdit,
@@ -67,6 +69,7 @@ export default function IncomeTableRow({
 
       <TableCell align="left">{amount}</TableCell>
       <TableCell align="left">{note}</TableCell>
+      <TableCell align="left">{itemName}</TableCell>
 
       <TableCell align="right">
         <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>

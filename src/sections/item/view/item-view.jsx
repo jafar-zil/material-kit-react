@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { fetchItems, addItem, editItem, deleteItem } from 'src/services/apiService'; // Import deleteItem
+import { fetchItems, addItem, editItem, deleteItem } from 'src/services/apiService';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -14,7 +14,6 @@ import TablePagination from '@mui/material/TablePagination';
 import Dialog from '@mui/material/Dialog';
 import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
-// import DialogContentText from '@mui/material/DialogContentText';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
 import FormControl from '@mui/material/FormControl';
@@ -24,6 +23,9 @@ import MenuItem from '@mui/material/MenuItem';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
+import TableRow from '@mui/material/TableRow';
+import TableCell from '@mui/material/TableCell';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import TableNoData from '../table-no-data';
@@ -49,15 +51,20 @@ export default function ItemPage() {
   const [loading, setLoading] = useState(false);
   const [apiError, setApiError] = useState(null);
   const [success, setSuccess] = useState(false);
-  const [confirmDelete, setConfirmDelete] = useState(false); // State for delete confirmation
-  const [deleteItemId, setDeleteItemId] = useState(null); // State for the item to delete
+  const [confirmDelete, setConfirmDelete] = useState(false);
+  const [deleteItemId, setDeleteItemId] = useState(null);
+  const [loadingItems, setLoadingItems] = useState(true);
+  const [loadingDelete, setLoadingDelete] = useState(false); // New state for loading delete
 
   const fetchItemsFromAPI = async () => {
+    setLoadingItems(true);
     try {
       const data = await fetchItems();
       setItems(data);
     } catch (error) {
       console.error('Failed to fetch items:', error);
+    } finally {
+      setLoadingItems(false);
     }
   };
 
@@ -174,9 +181,9 @@ export default function ItemPage() {
   const handleEditItem = (id, name, type) => {
     setCurrentItemId(id);
     setItemName(name);
-    if(type === "Income"){
+    if (type === "Income") {
       setItemType(1);
-    }else{
+    } else {
       setItemType(2);
     }
     setIsEditMode(true);
@@ -185,11 +192,12 @@ export default function ItemPage() {
 
   const handleDeleteItem = async (id) => {
     setConfirmDelete(true);
-    setDeleteItemId(id); // Set the item to be deleted
+    setDeleteItemId(id);
   };
 
   const handleConfirmDelete = async () => {
     if (deleteItemId) {
+      setLoadingDelete(true); // Set loading state for delete
       try {
         await deleteItem(deleteItemId);
         setSuccess(true);
@@ -197,6 +205,7 @@ export default function ItemPage() {
       } catch (error) {
         setApiError(error.message);
       } finally {
+        setLoadingDelete(false); // Reset loading state
         setConfirmDelete(false);
         setDeleteItemId(null);
       }
@@ -240,7 +249,7 @@ export default function ItemPage() {
             onFilterName={handleFilterByName}
           />
 
-          <Scrollbar>
+<Scrollbar>
             <TableContainer sx={{ minWidth: 300 }}>
               <Table>
                 <ItemTableHead
@@ -257,41 +266,54 @@ export default function ItemPage() {
                   onRequestSort={handleSort}
                 />
                 <TableBody>
-                  {dataFiltered
-                    .slice(
-                      page * rowsPerPage,
-                      page * rowsPerPage + rowsPerPage
-                    )
-                    .map((row) => {
-                      const { id, name, type } = row;
-                      const isItemSelected = selected.indexOf(name) !== -1;
+                  {loadingItems ? (
+                    <TableRow>
+                    <TableCell colSpan={3}>
+                      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height={200}>
+                        <CircularProgress size={24} />
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          Loading...
+                        </Typography>
+                      </Box>
+                    </TableCell>
+                  </TableRow>
+                  ) : (
+                    dataFiltered
+                      .slice(
+                        page * rowsPerPage,
+                        page * rowsPerPage + rowsPerPage
+                      )
+                      .map((row) => {
+                        const { id, name, type } = row;
+                        const isItemSelected = selected.indexOf(name) !== -1;
 
-                      return (
-                        <ItemTableRow
-                          key={id}
-                          id={id}
-                          name={name}
-                          type={type === '1' ? 'Income' : 'Expense'} 
-                          selected={isItemSelected}
-                          handleClick={(event) => handleClick(event, name)}
-                          onEdit={handleEditItem}
-                          onDelete={handleDeleteItem} // Pass handleDeleteItem
-                        />
-                      );
-                    })}
-                <TableEmptyRows
-                  height={77}
-                  emptyRows={emptyRows(page, rowsPerPage, items.length)}
-                />
+                        return (
+                          <ItemTableRow
+                            key={id}
+                            id={id}
+                            name={name}
+                            type={type === '1' ? 'Income' : 'Expense'}
+                            selected={isItemSelected}
+                            handleClick={(event) => handleClick(event, name)}
+                            onEdit={handleEditItem}
+                            onDelete={handleDeleteItem} // Pass handleDeleteItem
+                          />
+                        );
+                      })
+                  )}
+                  <TableEmptyRows
+                    height={77}
+                    emptyRows={emptyRows(page, rowsPerPage, items.length)}
+                  />
 
-                {notFound && <TableNoData query={filterName} />}
+                  {notFound && <TableNoData query={filterName} />}
                 </TableBody>
               </Table>
             </TableContainer>
           </Scrollbar>
 
           <TablePagination
-           rowsPerPageOptions={[10, 25, 50]}
+            rowsPerPageOptions={[10, 25, 50]}
             component="div"
             count={items.length}
             rowsPerPage={rowsPerPage}
@@ -325,67 +347,68 @@ export default function ItemPage() {
                 label="Type"
                 onChange={handleTypeChange}
               >
-               <MenuItem value={1}>Income</MenuItem>
-              <MenuItem value={2}>Expense</MenuItem>
+                <MenuItem value={1}>Income</MenuItem>
+                <MenuItem value={2}>Expense</MenuItem>
               </Select>
             </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>
-            <Button onClick={handleAddItem} disabled={loading}  variant="contained"
-            color="primary">
+            <Button onClick={handleAddItem} disabled={loading} variant="contained"
+              color="primary">
               {loading ? <CircularProgress size={24} /> : 'Submit'}
             </Button>
           </DialogActions>
         </Dialog>
 
-        <Dialog
-          open={confirmDelete}
-          onClose={handleCancelDelete}
-        >
-          <DialogTitle>Confirm Delete</DialogTitle>
-          <DialogContent>
-            <Typography>
-              Are you sure you want to delete this item?
-            </Typography>
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCancelDelete}>Cancel</Button>
-            <Button onClick={handleConfirmDelete} color="error">
-              Delete
-            </Button>
-          </DialogActions>
-        </Dialog>
+      <Dialog open={confirmDelete} onClose={handleCancelDelete}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <Typography>Are you sure you want to delete this item?</Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCancelDelete}>Cancel</Button>
+          <Button
+            onClick={handleConfirmDelete}
+            variant="contained"
+            color="error"
+            disabled={loadingDelete} // Disable button when loading
+            startIcon={loadingDelete ? <CircularProgress size={20} color="inherit" /> : null} // Add loading indicator
+          >
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
-        <Snackbar
-          open={success}
-          autoHideDuration={6000}
+      <Snackbar
+        open={success}
+        autoHideDuration={3000}
+        onClose={handleSuccessClose}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
           onClose={handleSuccessClose}
+          severity="success"
         >
-          <MuiAlert
-           elevation={6}
-           variant="filled"
-            onClose={handleSuccessClose}
-            severity="success"
-          >
             Item {isEditMode ? 'updated' : 'added'} successfully!
-          </MuiAlert>
-        </Snackbar>
+        </MuiAlert>
+      </Snackbar>
 
-        <Snackbar
-          open={apiError !== null}
-          autoHideDuration={6000}
+      <Snackbar
+        open={Boolean(apiError)}
+        autoHideDuration={3000}
+        onClose={handleErrorClose}
+      >
+        <MuiAlert
+          elevation={6}
+          variant="filled"
           onClose={handleErrorClose}
+          severity="error"
         >
-          <MuiAlert
-           elevation={6}
-           variant="filled"
-            onClose={handleErrorClose}
-            severity="error"
-          >
-            {apiError}
-          </MuiAlert>
-        </Snackbar>
+          {apiError}
+        </MuiAlert>
+      </Snackbar>
       </Container>
     </>
   );

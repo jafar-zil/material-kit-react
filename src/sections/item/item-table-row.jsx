@@ -11,12 +11,13 @@ import Popover from '@mui/material/Popover';
 import Iconify from 'src/components/iconify';
 
 ItemTableRow.propTypes = {
-  id: PropTypes.number.isRequired, // Add id prop
+  id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   selected: PropTypes.bool,
   handleClick: PropTypes.func,
-  onEdit: PropTypes.func.isRequired, // Add onEdit prop
+  onEdit: PropTypes.func.isRequired,
+  onDelete: PropTypes.func.isRequired, // Add onDelete prop
 };
 
 export default function ItemTableRow({
@@ -25,7 +26,8 @@ export default function ItemTableRow({
   type,
   selected,
   handleClick,
-  onEdit, // Add onEdit prop
+  onEdit,
+  onDelete, // Add onDelete prop
 }) {
   const [openPopover, setOpenPopover] = useState(null);
 
@@ -39,7 +41,12 @@ export default function ItemTableRow({
 
   const handleEdit = () => {
     handleClosePopover();
-    onEdit(id, name, type); // Pass the id, name, and type to the edit handler
+    onEdit(id, name, type);
+  };
+
+  const handleDelete = () => {
+    handleClosePopover();
+    onDelete(id); // Call the delete handler with the item's id
   };
 
   return (
@@ -75,7 +82,7 @@ export default function ItemTableRow({
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Edit
         </MenuItem>
-        <MenuItem onClick={handleClosePopover} sx={{ color: 'error.main' }}>
+        <MenuItem onClick={handleDelete} sx={{ color: 'error.main' }}>
           <Iconify icon="eva:trash-2-outline" sx={{ mr: 2 }} />
           Delete
         </MenuItem>

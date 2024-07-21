@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { fetchItems, addItem, editItem } from 'src/services/apiService'; // Import your API service functions
+import { fetchItems, addItem, editItem, deleteItem } from 'src/services/apiService'; // Import deleteItem
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -44,13 +44,14 @@ export default function ItemPage() {
   const [open, setOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentItemId, setCurrentItemId] = useState(null);
-  const [itemName, setItemName] = useState(''); // Renamed to avoid conflict
-  const [itemType, setItemType] = useState(''); // Renamed to avoid conflict
+  const [itemName, setItemName] = useState('');
+  const [itemType, setItemType] = useState('');
   const [loading, setLoading] = useState(false);
-  const [apiError, setApiError] = useState(null); // Renamed to avoid conflict
+  const [apiError, setApiError] = useState(null);
   const [success, setSuccess] = useState(false);
+  const [confirmDelete, setConfirmDelete] = useState(false); // State for delete confirmation
+  const [deleteItemId, setDeleteItemId] = useState(null); // State for the item to delete
 
-  // Fetch items from the API
   const fetchItemsFromAPI = async () => {
     try {
       const data = await fetchItems();
@@ -123,8 +124,8 @@ export default function ItemPage() {
 
   const handleClickOpen = () => {
     setOpen(true);
-    setIsEditMode(false); // Set mode to add
-    setItemName(''); // Reset form fields
+    setIsEditMode(false);
+    setItemName('');
     setItemType('');
   };
 
@@ -145,7 +146,6 @@ export default function ItemPage() {
     setSuccess(false);
   };
 
-  // Show an error toast
   const handleErrorClose = () => {
     setApiError(null);
   };
@@ -155,35 +155,23 @@ export default function ItemPage() {
 
     try {
       if (isEditMode) {
-        // Edit item mode
         await editItem(currentItemId, itemName, itemType);
         setSuccess(true);
       } else {
-        // Add item mode
         await addItem(itemName, itemType);
         setSuccess(true);
       }
 
-      fetchItemsFromAPI(); // Refresh items list
+      fetchItemsFromAPI();
       handleClose();
     } catch (error) {
-      console.error('Failed to add/edit item:', error);
       setApiError(error.message);
     } finally {
       setLoading(false);
     }
   };
-  const getButtonLabel = () => {
-    if (loading) {
-      return <CircularProgress size={24} />;
-    }
-    return isEditMode ? 'Update Item' : 'Add Item';
-  };
 
-  // Handle edit initiation
-  const handleEditOpen = (id, name, type) => {
-    setOpen(true);
-    setIsEditMode(true);
+  const handleEditItem = (id, name, type) => {
     setCurrentItemId(id);
     setItemName(name);
     if(type === "Income"){
@@ -191,154 +179,214 @@ export default function ItemPage() {
     }else{
       setItemType(2);
     }
+    setIsEditMode(true);
+    setOpen(true);
+  };
 
-    console.log(itemType);
+  const handleDeleteItem = async (id) => {
+    setConfirmDelete(true);
+    setDeleteItemId(id); // Set the item to be deleted
+  };
+
+  const handleConfirmDelete = async () => {
+    if (deleteItemId) {
+      try {
+        await deleteItem(deleteItemId);
+        setSuccess(true);
+        fetchItemsFromAPI();
+      } catch (error) {
+        setApiError(error.message);
+      } finally {
+        setConfirmDelete(false);
+        setDeleteItemId(null);
+      }
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setConfirmDelete(false);
+    setDeleteItemId(null);
   };
 
   return (
-    <Container>
+    <>
       <Helmet>
-        <title> Items | YourAppName </title>
+        <title>Item List</title>
       </Helmet>
 
-      <Stack direction="row" alignItems="center" justifyContent="space-between" mb={5}>
-        <Typography variant="h4" gutterBottom>
-          Items
-        </Typography>
-        <Button variant="contained" startIcon={<Iconify icon="eva:plus-fill" />} onClick={handleClickOpen}>
-          New Item
-        </Button>
-      </Stack>
+      <Container maxWidth="lg">
+        <Stack
+          direction="row"
+          alignItems="center"
+          justifyContent="space-between"
+          mb={5}
+        >
+          <Typography variant="h4" gutterBottom>
+            Item List
+          </Typography>
+          <Button
+            variant="contained"
+            startIcon={<Iconify icon="eva:plus-fill" />}
+            onClick={handleClickOpen}
+          >
+            New Item
+          </Button>
+        </Stack>
 
-      <Card>
-        <ItemTableToolbar
-          numSelected={selected.length}
-          filterName={filterName}
-          onFilterName={handleFilterByName}
-        />
+        <Card>
+          <ItemTableToolbar
+            numSelected={selected.length}
+            filterName={filterName}
+            onFilterName={handleFilterByName}
+          />
 
-        <Scrollbar>
-          <TableContainer sx={{ minWidth: 300 }}>
-            <Table>
-              <ItemTableHead
-                order={order}
-                orderBy={orderBy}
-                headLabel={[
-                  { id: 'name', label: 'Name', alignRight: false },
-                  { id: 'type', label: 'Type', alignRight: false },
-                  { id: '' },
-                ]}
-                rowCount={items.length}
-                numSelected={selected.length}
-                onSelectAllClick={handleSelectAllClick}
-                onRequestSort={handleSort}
-              />
-              <TableBody>
-                {dataFiltered
-                  .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                  .map((row) => {
-                    const { id, name, type } = row;
-                    const isSelected = selected.indexOf(name) !== -1;
+          <Scrollbar>
+            <TableContainer sx={{ minWidth: 300 }}>
+              <Table>
+                <ItemTableHead
+                  order={order}
+                  orderBy={orderBy}
+                  headLabel={[
+                    { id: 'name', label: 'Name', alignRight: false },
+                    { id: 'type', label: 'Type', alignRight: false },
+                    { id: '' },
+                  ]}
+                  rowCount={items.length}
+                  numSelected={selected.length}
+                  onSelectAllClick={handleSelectAllClick}
+                  onRequestSort={handleSort}
+                />
+                <TableBody>
+                  {dataFiltered
+                    .slice(
+                      page * rowsPerPage,
+                      page * rowsPerPage + rowsPerPage
+                    )
+                    .map((row) => {
+                      const { id, name, type } = row;
+                      const isItemSelected = selected.indexOf(name) !== -1;
 
-                    return (
-                      <ItemTableRow
-                        key={id}
-                        id={id}
-                        name={name}
-                        type={type === '1' ? 'Income' : 'Expense'} // Conditional rendering
-                        selected={isSelected}
-                        handleClick={(event) => handleClick(event, name)}
-                        onEdit={handleEditOpen} // Pass edit handler
-                      />
-                    );
-                  })}
+                      return (
+                        <ItemTableRow
+                          key={id}
+                          id={id}
+                          name={name}
+                          type={type === '1' ? 'Income' : 'Expense'} 
+                          selected={isItemSelected}
+                          handleClick={(event) => handleClick(event, name)}
+                          onEdit={handleEditItem}
+                          onDelete={handleDeleteItem} // Pass handleDeleteItem
+                        />
+                      );
+                    })}
                 <TableEmptyRows
                   height={77}
                   emptyRows={emptyRows(page, rowsPerPage, items.length)}
                 />
 
                 {notFound && <TableNoData query={filterName} />}
-              </TableBody>
-            </Table>
-          </TableContainer>
-        </Scrollbar>
+                </TableBody>
+              </Table>
+            </TableContainer>
+          </Scrollbar>
 
-        <TablePagination
-          rowsPerPageOptions={[10, 25, 50]}
-          component="div"
-          count={items.length}
-          rowsPerPage={rowsPerPage}
-          page={page}
-          onPageChange={handleChangePage}
-          onRowsPerPageChange={handleChangeRowsPerPage}
-        />
-      </Card>
-
-      <Dialog open={open} onClose={handleClose}>
-        <DialogTitle>{isEditMode ? 'Edit Item' : 'Add New Item'}</DialogTitle>
-        <DialogContent>
-        
-          <TextField
-            margin="dense"
-            id="name"
-            label="Name"
-            type="text"
-            fullWidth
-            variant="standard"
-            value={itemName}
-            onChange={handleNameChange}
+          <TablePagination
+           rowsPerPageOptions={[10, 25, 50]}
+            component="div"
+            count={items.length}
+            rowsPerPage={rowsPerPage}
+            page={page}
+            onPageChange={handleChangePage}
+            onRowsPerPageChange={handleChangeRowsPerPage}
           />
-        <FormControl fullWidth margin="dense" variant="standard">
-            <InputLabel id="type-label">Type</InputLabel>
-            <Select
-              labelId="type-label"
-              id="type"
-              value={itemType}
-              label="Type"
-              onChange={handleTypeChange}
-            >
+        </Card>
+
+        <Dialog open={open} onClose={handleClose}>
+          <DialogTitle>
+            {isEditMode ? 'Edit Item' : 'Add New Item'}
+          </DialogTitle>
+          <DialogContent>
+            <TextField
+              margin="dense"
+              id="name"
+              label="Item Name"
+              type="text"
+              fullWidth
+              variant="standard"
+              value={itemName}
+              onChange={handleNameChange}
+            />
+            <FormControl fullWidth margin="dense" variant="standard">
+              <InputLabel id="item-type-label">Type</InputLabel>
+              <Select
+                labelId="item-type-label"
+                id="item-type"
+                value={itemType}
+                label="Type"
+                onChange={handleTypeChange}
+              >
                <MenuItem value={1}>Income</MenuItem>
               <MenuItem value={2}>Expense</MenuItem>
-            </Select>
-          </FormControl>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose}>Cancel</Button>
-          <Button
-            onClick={handleAddItem}
-            disabled={loading}
-            variant="contained"
-            color="primary"
-          >
-            {getButtonLabel()}
-          </Button>
-        </DialogActions>
-      </Dialog>
-      {/* Success Snackbar */}
-      <Snackbar open={success} autoHideDuration={6000} onClose={handleSuccessClose}>
-        <MuiAlert
-          elevation={6}
-          variant="filled"
-          onClose={handleSuccessClose}
-          severity="success"
-        >
-          Item {isEditMode ? 'updated' : 'added'} successfully!
-        </MuiAlert>
-      </Snackbar>
+              </Select>
+            </FormControl>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleAddItem} disabled={loading}  variant="contained"
+            color="primary">
+              {loading ? <CircularProgress size={24} /> : 'Submit'}
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      {/* Error Snackbar */}
-      {apiError && (
-        <Snackbar open={Boolean(apiError)} autoHideDuration={6000} onClose={handleErrorClose}>
+        <Dialog
+          open={confirmDelete}
+          onClose={handleCancelDelete}
+        >
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>
+              Are you sure you want to delete this item?
+            </Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancelDelete}>Cancel</Button>
+            <Button onClick={handleConfirmDelete} color="error">
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
+
+        <Snackbar
+          open={success}
+          autoHideDuration={6000}
+          onClose={handleSuccessClose}
+        >
           <MuiAlert
-            elevation={6}
-            variant="filled"
+           elevation={6}
+           variant="filled"
+            onClose={handleSuccessClose}
+            severity="success"
+          >
+            Item {isEditMode ? 'updated' : 'added'} successfully!
+          </MuiAlert>
+        </Snackbar>
+
+        <Snackbar
+          open={apiError !== null}
+          autoHideDuration={6000}
+          onClose={handleErrorClose}
+        >
+          <MuiAlert
+           elevation={6}
+           variant="filled"
             onClose={handleErrorClose}
             severity="error"
           >
             {apiError}
           </MuiAlert>
         </Snackbar>
-      )}
-    </Container>
+      </Container>
+    </>
   );
 }

@@ -34,7 +34,7 @@ import TableNoData from '../table-no-data';
 import IncomeTableRow from '../income-table-row';
 import IncomeTableHead from '../income-table-head';
 import TableEmptyRows from '../table-empty-rows';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import { emptyRows } from '../utils';
 
 export default function IncomePage() {
   const [incomes, setIncomes] = useState([]);
@@ -43,6 +43,7 @@ export default function IncomePage() {
   const [orderBy, setOrderBy] = useState('');
   const filterName = "";
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowCount, setRowCount] = useState(0);
   const [open, setOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentIncomeId, setCurrentIncomeId] = useState(null);
@@ -78,11 +79,12 @@ const filterTypes = {
     setLoadingIncomes(true);
     try {
       const startRow = currentPage * currentRowsPerPage;
+      const endRow = startRow + currentRowsPerPage;
       const sortModel = sortBy ? [{ field: sortBy, sort: sortOrder }] : [];
 
       const payload = {
         startRow,
-        endRow: currentRowsPerPage,
+        endRow,
         filterModel,
         sortModel,
       };
@@ -90,6 +92,7 @@ const filterTypes = {
       // console.log(payload);
       const data = await fetchIncomes(payload);
       setIncomes(data.rowData);
+      setRowCount(data.rowCount);
     } catch (error) {
       console.error('Failed to fetch incomes:', error);
     } finally {
@@ -143,13 +146,8 @@ const filterTypes = {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const dataFiltered = applyFilter({
-    inputData: incomes,
-    comparator: getComparator(order, orderBy),
-    filterModel: filters, // Use the filters model directly
-  });
 
-  const notFound = !dataFiltered.length && !!filterName;
+  const notFound = !incomes.length && !!filterName;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -304,7 +302,7 @@ const filterTypes = {
                       </TableCell>
                     </TableRow>
                   ) : (
-                    dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                    incomes.map((row) => (
                       <IncomeTableRow
                         key={row.id}
                         row={row}
@@ -319,7 +317,7 @@ const filterTypes = {
                   )}
                   <TableEmptyRows
                     height={50}
-                    emptyRows={emptyRows(page, rowsPerPage, incomes.length)}
+                    emptyRows={emptyRows(page, rowsPerPage, rowCount)}
                   />
                   {notFound && <TableNoData query={filterName} />}
                 </TableBody>
@@ -330,7 +328,7 @@ const filterTypes = {
           <TablePagination
             rowsPerPageOptions={[5, 10, 25]}
             component="div"
-            count={incomes.length}
+            count={rowCount}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

@@ -103,14 +103,17 @@ const filterTypes = {
   }, []); // Ensure stable reference with an empty dependency array
 
   const handleFilterChange = (id, value, filterType, type) => {
-    setFilters(prevFilters => {
-      const { [id]: removedFilter, ...restFilters } = prevFilters;
+    setFilters((prevFilters) => {
+      const restFilters = { ...prevFilters };
+      delete restFilters[id]; // Remove the filter if it exists
+  
       if (value === '' || value === null) {
-        return restFilters; // Remove the filter if value is null or empty
+        return restFilters; // Return without the removed filter
       }
+  
       return {
         ...prevFilters,
-        [id]: { filter: value, filterType, type }
+        [id]: { filter: value, filterType, type },
       };
     });
   };

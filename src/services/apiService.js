@@ -1,5 +1,4 @@
 const BASE_URL = 'https://cashflow.botire.in';
-const token = localStorage.getItem('authToken');
 
 const handleResponse = async (response) => {
   if (!response.ok) {
@@ -19,18 +18,21 @@ export const loginUser = (email, password) =>
     body: JSON.stringify({ email, password }),
   }).then(handleResponse);
 
-export const fetchItems = () =>
-  fetch(`${BASE_URL}/api/item`, {
+export const fetchItems = () => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/item`, {
     method: 'GET',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${token}`, // Dynamically retrieve the token
     },
   }).then(handleResponse);
+};
 
-export const addItem = (name, type) =>
-  fetch(`${BASE_URL}/api/item`, {
+export const addItem = (name, type) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/item`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -39,9 +41,11 @@ export const addItem = (name, type) =>
     },
     body: JSON.stringify({ name, type }),
   }).then(handleResponse);
+};
 
-export const editItem = (id, name, type) =>
-  fetch(`${BASE_URL}/api/item/${id}`, {
+export const editItem = (id, name, type) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/item/${id}`, {
     method: 'PUT',
     headers: {
       Accept: 'application/json',
@@ -50,9 +54,11 @@ export const editItem = (id, name, type) =>
     },
     body: JSON.stringify({ name, type }),
   }).then(handleResponse);
+};
 
-export const deleteItem = (id) =>
-  fetch(`${BASE_URL}/api/item/${id}`, {
+export const deleteItem = (id) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/item/${id}`, {
     method: 'DELETE',
     headers: {
       Accept: 'application/json',
@@ -61,9 +67,11 @@ export const deleteItem = (id) =>
     },
     body: null,
   }).then(handleResponse);
+};
 
-export const fetchIncomes = (payload) =>
-  fetch(`${BASE_URL}/api/datatable/income`, {
+export const fetchIncomes = (payload) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/datatable/income`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -72,9 +80,11 @@ export const fetchIncomes = (payload) =>
     },
     body: JSON.stringify(payload),
   }).then(handleResponse);
+};
 
-  export const addIncome = (incomeData) => 
-  fetch(`${BASE_URL}/api/income`, {
+export const addIncome = (incomeData) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/income`, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
@@ -83,8 +93,10 @@ export const fetchIncomes = (payload) =>
     },
     body: JSON.stringify(incomeData),
   }).then(handleResponse);
+};
 
-export const editIncome = (id, incomeData) => 
+export const editIncome = (id, incomeData) => {
+  const token = localStorage.getItem('authToken');
   fetch(`${BASE_URL}/api/income/${id}`, {
     method: 'PUT',
     headers: {
@@ -93,9 +105,11 @@ export const editIncome = (id, incomeData) =>
       Authorization: `Bearer ${token}`,
     },
     body: JSON.stringify(incomeData),
-  }).then(handleResponse);
+  }).then(handleResponse)
+};
 
-export const deleteIncome = (id) =>
+export const deleteIncome = (id) => {
+  const token = localStorage.getItem('authToken');
   fetch(`${BASE_URL}/api/income/${id}`, {
     method: 'DELETE',
     headers: {
@@ -104,4 +118,5 @@ export const deleteIncome = (id) =>
       Authorization: `Bearer ${token}`,
     },
     body: null,
-  }).then(handleResponse);
+  }).then(handleResponse)
+};

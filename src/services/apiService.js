@@ -62,14 +62,15 @@ export const deleteItem = (id) =>
     body: null,
   }).then(handleResponse);
 
-export const fetchIncomes = () =>
-  fetch(`${BASE_URL}/api/income`, {
-    method: 'GET',
+export const fetchIncomes = (payload) =>
+  fetch(`${BASE_URL}/api/datatable/income`, {
+    method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify(payload),
   }).then(handleResponse);
 
   export const addIncome = (incomeData) => 

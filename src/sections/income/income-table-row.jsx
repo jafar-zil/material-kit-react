@@ -10,26 +10,19 @@ import Popover from '@mui/material/Popover';
 import Iconify from 'src/components/iconify';
 
 IncomeTableRow.propTypes = {
-  id: PropTypes.number.isRequired,
-  date: PropTypes.string.isRequired,
-  amount: PropTypes.string.isRequired,
-  note: PropTypes.string,
-  itemId: PropTypes.string,
-  itemName: PropTypes.string,
+  row: PropTypes.shape({
+    id: PropTypes.number.isRequired,
+    date: PropTypes.string.isRequired,
+    amount: PropTypes.string.isRequired,
+    note: PropTypes.string,
+    item_id: PropTypes.string, // Adjusted prop name
+    item_name: PropTypes.string, // Adjusted prop name
+  }).isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
 };
 
-export default function IncomeTableRow({
-  id,
-  date,
-  amount,
-  note,
-  itemId,
-  itemName,
-  onEdit,
-  onDelete,
-}) {
+export default function IncomeTableRow({ row, onEdit, onDelete }) {
   const [openPopover, setOpenPopover] = useState(null);
 
   const handleOpenPopover = (event) => {
@@ -42,26 +35,25 @@ export default function IncomeTableRow({
 
   const handleEdit = () => {
     handleClosePopover();
-    onEdit(id, date, amount, note, itemId); // Pass itemId to onEdit
+    onEdit(row.id, row.date, row.amount, row.note, row.item_id); // Pass item_id to onEdit
   };
 
   const handleDelete = () => {
     handleClosePopover();
-    onDelete(id);
+    onDelete(row.id);
   };
 
   return (
     <TableRow hover>
-    
       <TableCell>
         <Stack direction="row" alignItems="center" spacing={2}>
-          <Typography variant="subtitle2">{date}</Typography>
+          <Typography variant="subtitle2">{row.date}</Typography>
         </Stack>
       </TableCell>
 
-      <TableCell align="left">{amount}</TableCell>
-      <TableCell align="left">{note}</TableCell>
-      <TableCell align="left">{itemName}</TableCell>
+      <TableCell align="left">{row.amount}</TableCell>
+      <TableCell align="left">{row.note}</TableCell>
+      <TableCell align="left">{row.item_name}</TableCell>
 
       <TableCell align="right">
         <IconButton color={openPopover ? 'inherit' : 'default'} onClick={handleOpenPopover}>
@@ -90,4 +82,3 @@ export default function IncomeTableRow({
     </TableRow>
   );
 }
-

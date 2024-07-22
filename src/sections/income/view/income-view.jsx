@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import {
   fetchItems,
@@ -22,11 +22,9 @@ import DialogActions from '@mui/material/DialogActions';
 import DialogContent from '@mui/material/DialogContent';
 import DialogTitle from '@mui/material/DialogTitle';
 import TextField from '@mui/material/TextField';
-import FormControl from '@mui/material/FormControl';
 import CircularProgress from '@mui/material/CircularProgress';
 import Snackbar from '@mui/material/Snackbar';
 import MuiAlert from '@mui/material/Alert';
-import Box from '@mui/material/Box';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Autocomplete from '@mui/material/Autocomplete';
@@ -43,7 +41,7 @@ export default function IncomePage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('');
-  const filterName= "";
+  const filterName = "";
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [open, setOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
@@ -60,29 +58,70 @@ export default function IncomePage() {
   const [incomeNote, setNote] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [items, setItems] = useState([]);
+  const [filters, setFilters] = useState({});
 
-  const fetchIncomesFromAPI = async () => {
+const headLabel = [
+  { id: 'date', label: 'Date', filterType: 'date' },
+  { id: 'amount', label: 'Amount', filterType: 'number' },
+  { id: 'note', label: 'Note', filterType: 'text' },
+  { id: 'item_id', label: 'Item', filterType: 'autocomplete' },
+  { id: '',label: '', filterType: null  },
+];
+
+const filterTypes = {
+  amount: { filterType: 'text', type: 'contains' },
+  date: { filterType: 'text', type: 'equals' },
+  note: { filterType: 'text', type: 'contains' },
+  item_id: { filterType: 'text', type: 'equals' }
+};
+  const fetchIncomesFromAPI = useCallback(async (filterModel, currentPage, currentRowsPerPage, sortOrder, sortBy) => {
     setLoadingIncomes(true);
     try {
-      const data = await fetchIncomes();
-      setIncomes(data);
+      const startRow = currentPage * currentRowsPerPage;
+      const sortModel = sortBy ? [{ field: sortBy, sort: sortOrder }] : [];
+
+      const payload = {
+        startRow,
+        endRow: currentRowsPerPage,
+        filterModel,
+        sortModel,
+      };
+
+      // console.log(payload);
+      const data = await fetchIncomes(payload);
+      setIncomes(data.rowData);
     } catch (error) {
       console.error('Failed to fetch incomes:', error);
     } finally {
       setLoadingIncomes(false);
     }
-  };
+  }, []); // Ensure stable reference with an empty dependency array
 
-
-  const fetchItemsFromAPI = async () => {
+  const fetchItemsFromAPI = useCallback(async () => {
     const data = await fetchItems();
     setItems(data);
+  }, []); // Ensure stable reference with an empty dependency array
+
+  const handleFilterChange = (id, value, filterType, type) => {
+    setFilters(prevFilters => {
+      const { [id]: removedFilter, ...restFilters } = prevFilters;
+      if (value === '' || value === null) {
+        return restFilters; // Remove the filter if value is null or empty
+      }
+      return {
+        ...prevFilters,
+        [id]: { filter: value, filterType, type }
+      };
+    });
   };
 
   useEffect(() => {
-    fetchIncomesFromAPI();
     fetchItemsFromAPI();
-  }, []);
+  }, [fetchItemsFromAPI]);
+
+  useEffect(() => {
+    fetchIncomesFromAPI(filters, page, rowsPerPage, order, orderBy);
+  }, [filters, page, rowsPerPage, order, orderBy, fetchIncomesFromAPI]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -91,10 +130,6 @@ export default function IncomePage() {
       setOrderBy(id);
     }
   };
-
-
-
-
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -105,12 +140,10 @@ export default function IncomePage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-
-
   const dataFiltered = applyFilter({
     inputData: incomes,
     comparator: getComparator(order, orderBy),
-    filterName,
+    filterModel: filters, // Use the filters model directly
   });
 
   const notFound = !dataFiltered.length && !!filterName;
@@ -172,7 +205,7 @@ export default function IncomePage() {
         setSuccessMesage('Income added successfully');
       }
 
-      fetchIncomesFromAPI();
+      fetchIncomesFromAPI(filters, page, rowsPerPage, order, orderBy); // Pass current filters and pagination settings
       handleClose();
     } catch (error) {
       setApiError(error.message);
@@ -186,13 +219,13 @@ export default function IncomePage() {
     setNote(note);
     setDate(date);
     setAmount(amount);
-  
+
     // Convert itemId to number for comparison
     const itemIdNum = Number(itemId);
     const itemToSelect = items.find((item) => item.id === itemIdNum);
-  
+
     setSelectedItem(itemToSelect || null); // Set the selected item or null if not found
-  
+
     setIsEditMode(true);
     setOpen(true);
   };
@@ -208,7 +241,7 @@ export default function IncomePage() {
       try {
         await deleteIncome(deleteIncomeId);
         setSuccessMesage('Income deleted successfully');
-        fetchIncomesFromAPI();
+        fetchIncomesFromAPI(filters, page, rowsPerPage, order, orderBy);
       } catch (error) {
         setApiError(error.message);
       } finally {
@@ -245,66 +278,46 @@ export default function IncomePage() {
         </Stack>
 
         <Card>
-
           <Scrollbar>
             <TableContainer sx={{ minWidth: 300 }}>
               <Table>
                 <IncomeTableHead
                   order={order}
                   orderBy={orderBy}
-                  headLabel={[
-                    { id: 'date', label: 'Date', alignRight: false },
-                    { id: 'amount', label: 'Amount', alignRight: false },
-                    { id: 'note', label: 'Note', alignRight: false },
-                    { id: 'item_name', label: 'Item', alignRight: false },
-                    { id: '' },
-                  ]}
+                  headLabel={headLabel}
                   onRequestSort={handleSort}
+                  onFilterChange={handleFilterChange}
+                  filterTypes={filterTypes}
+                  filterOptions={items}
                 />
                 <TableBody>
                   {loadingIncomes ? (
                     <TableRow>
-                      <TableCell colSpan={3}>
-                        <Box
-                          display="flex"
-                          flexDirection="column"
-                          alignItems="center"
-                          justifyContent="center"
-                          height={200}
-                        >
-                          <CircularProgress size={24} />
-                          <Typography variant="body2" sx={{ mt: 1 }}>
-                            Loading...
-                          </Typography>
-                        </Box>
+                      <TableCell align="center" colSpan={5}>
+                        <CircularProgress size={24} />
+                        <Typography variant="body2" sx={{ mt: 1 }}>
+                          Loading...
+                        </Typography>
                       </TableCell>
                     </TableRow>
                   ) : (
-                    dataFiltered
-                      .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                      .map((row) => {
-                        const { id, date, amount, note, item_id,item_name } = row;
-
-                        return (
-                          <IncomeTableRow
-                            key={id}
-                            id={id}
-                            date={date}
-                            amount={amount}
-                            note={note}
-                            itemId={item_id}
-                            itemName={item_name}
-                            onEdit={handleEditIncome}
-                            onDelete={handleDeleteIncome}
-                          />
-                        );
-                      })
+                    dataFiltered.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map((row) => (
+                      <IncomeTableRow
+                        key={row.id}
+                        row={row}
+                        onEdit={() =>
+                          handleEditIncome(row.id, row.date, row.amount, row.note, row.item_id)
+                        }
+                        onDelete={() => handleDeleteIncome(row.id)}
+                        loadingDelete={loadingDelete}
+                        isDeleting={deleteIncomeId === row.id}
+                      />
+                    ))
                   )}
                   <TableEmptyRows
-                    height={77}
+                    height={50}
                     emptyRows={emptyRows(page, rowsPerPage, incomes.length)}
                   />
-
                   {notFound && <TableNoData query={filterName} />}
                 </TableBody>
               </Table>
@@ -312,7 +325,7 @@ export default function IncomePage() {
           </Scrollbar>
 
           <TablePagination
-            rowsPerPageOptions={[10, 25, 50]}
+            rowsPerPageOptions={[5, 10, 25]}
             component="div"
             count={incomes.length}
             rowsPerPage={rowsPerPage}
@@ -322,69 +335,72 @@ export default function IncomePage() {
           />
         </Card>
 
-        <Dialog open={open} onClose={handleClose}>
-          <DialogTitle>{isEditMode ? 'Edit Income' : 'Add New Income'}</DialogTitle>
+        <Dialog
+          open={open}
+          onClose={handleClose}
+          maxWidth="md" // or another size like "sm", "lg", "xl"
+          fullWidth
+          sx={{ '& .MuiDialog-paper': { width: '600px', maxWidth: '80%' } }} // Custom width styling
+        >
+          <DialogTitle>{isEditMode ? 'Edit Income' : 'Add Income'}</DialogTitle>
           <DialogContent>
-            {/* Amount Input */}
-            <TextField
-              margin="dense"
-              id="amount"
-              label="Amount"
-              type="number"
-              fullWidth
-              variant="standard"
-              value={incomeAmount}
-              onChange={handleAmountChange}
-            />
-
-            {/* Date Picker */}
-            <FormControl fullWidth margin="dense" variant="standard">
+            <Stack spacing={2}>
               <TextField
+                margin="dense"
+                id="amount"
+                label="Amount"
+                type="number"
+                fullWidth
+                variant="outlined"
+                value={incomeAmount}
+                onChange={handleAmountChange}
+              />
+              <TextField
+                margin="dense"
                 id="date"
                 label="Date"
                 type="date"
                 fullWidth
-                variant="standard"
+                variant="outlined"
                 value={incomeDate}
                 onChange={handleDateChange}
                 InputLabelProps={{
                   shrink: true,
                 }}
               />
-            </FormControl>
-
-            {/* Note Input */}
-            <TextField
-              margin="dense"
-              id="note"
-              label="Note"
-              type="text"
-              fullWidth
-              variant="standard"
-              value={incomeNote}
-              onChange={handleNoteChange}
-            />
-
-            {/* Item Autocomplete */}
-            <Autocomplete
-              options={items}
-              getOptionLabel={(option) => option.name}
-              value={selectedItem}
-              onChange={(event, newValue) => handleItemChange(newValue)}
-              renderInput={(params) => (
-                <TextField {...params} label="Item" variant="standard" margin="dense" fullWidth />
-              )}
-            />
+              <TextField
+                margin="dense"
+                id="note"
+                label="Note"
+                type="text"
+                fullWidth
+                variant="outlined"
+                value={incomeNote}
+                onChange={handleNoteChange}
+              />
+              <Autocomplete
+                value={selectedItem}
+                onChange={(event, newValue) => {
+                  handleItemChange(newValue);
+                }}
+                options={items}
+                getOptionLabel={(option) => option.name}
+                renderInput={(params) => <TextField {...params} label="Select Item" />}
+                fullWidth
+              />
+            </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose}>Cancel</Button>
+            <Button onClick={handleClose} color="secondary">
+              Cancel
+            </Button>
             <Button
               onClick={handleAddIncome}
-              disabled={loading}
-              variant="contained"
               color="primary"
+              variant="contained"
+              disabled={loading || loadingIncomes || loadingDelete}
             >
-              {loading ? <CircularProgress size={24} /> : 'Submit'}
+              {isEditMode ? 'Update' : 'Add'}
             </Button>
           </DialogActions>
         </Dialog>
@@ -392,16 +408,17 @@ export default function IncomePage() {
         <Dialog open={confirmDelete} onClose={handleCancelDelete}>
           <DialogTitle>Confirm Delete</DialogTitle>
           <DialogContent>
-            <Typography>Are you sure you want to delete this income?</Typography>
+            Are you sure you want to delete this income?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCancelDelete}>Cancel</Button>
+            <Button onClick={handleCancelDelete} color="secondary">
+              Cancel
+            </Button>
             <Button
               onClick={handleConfirmDelete}
               variant="contained"
-              color="error"
+              color="primary"
               disabled={loadingDelete}
-              startIcon={loadingDelete ? <CircularProgress size={20} color="inherit" /> : null}
             >
               Delete
             </Button>
@@ -409,17 +426,17 @@ export default function IncomePage() {
         </Dialog>
 
         <Snackbar
-          open={Boolean(successMesage)}
-          autoHideDuration={3000}
+          open={!!successMesage}
+          autoHideDuration={6000}
           onClose={handleSuccessClose}
         >
-          <MuiAlert elevation={6} variant="filled" onClose={handleSuccessClose} severity="success">
+          <MuiAlert onClose={handleSuccessClose} severity="success" sx={{ width: '100%' }}>
             {successMesage}
           </MuiAlert>
         </Snackbar>
 
-        <Snackbar open={Boolean(apiError)} autoHideDuration={3000} onClose={handleErrorClose}>
-          <MuiAlert elevation={6} variant="filled" onClose={handleErrorClose} severity="error">
+        <Snackbar open={!!apiError} autoHideDuration={6000} onClose={handleErrorClose}>
+          <MuiAlert onClose={handleErrorClose} severity="error" sx={{ width: '100%' }}>
             {apiError}
           </MuiAlert>
         </Snackbar>

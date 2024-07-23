@@ -392,7 +392,7 @@ const filterTypes = {
             </Stack>
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleClose} color="secondary">
+            <Button onClick={handleClose} variant="outlined">
               Cancel
             </Button>
             <Button
@@ -402,6 +402,7 @@ const filterTypes = {
               disabled={loading || loadingIncomes || loadingDelete}
             >
               {isEditMode ? 'Update' : 'Add'}
+              {loading ? <CircularProgress size={14} sx={{ marginLeft: 1 }} />  : ""}
             </Button>
           </DialogActions>
         </Dialog>
@@ -412,16 +413,17 @@ const filterTypes = {
             Are you sure you want to delete this income?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCancelDelete} color="secondary">
+            <Button onClick={handleCancelDelete} variant="outlined">
               Cancel
             </Button>
             <Button
               onClick={handleConfirmDelete}
               variant="contained"
-              color="primary"
+              color="error"
               disabled={loadingDelete}
             >
               Delete
+              {loadingDelete ? <CircularProgress size={14} sx={{ marginLeft: 1 }} />  : ""}
             </Button>
           </DialogActions>
         </Dialog>

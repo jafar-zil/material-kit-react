@@ -109,7 +109,7 @@ export const addIncome = (incomeData) => {
 
 export const editIncome = (id, incomeData) => {
   const token = localStorage.getItem('authToken');
-  fetch(`${BASE_URL}/api/income/${id}`, {
+  return fetch(`${BASE_URL}/api/income/${id}`, {
     method: 'PUT',
     headers: {
       Accept: 'application/json',
@@ -122,7 +122,7 @@ export const editIncome = (id, incomeData) => {
 
 export const deleteIncome = (id) => {
   const token = localStorage.getItem('authToken');
-  fetch(`${BASE_URL}/api/income/${id}`, {
+  return fetch(`${BASE_URL}/api/income/${id}`, {
     method: 'DELETE',
     headers: {
       Accept: 'application/json',
@@ -161,7 +161,7 @@ export const addExpense = (expenseData) => {
 
 export const editExpense = (id, expenseData) => {
   const token = localStorage.getItem('authToken');
-  fetch(`${BASE_URL}/api/expense/${id}`, {
+  return fetch(`${BASE_URL}/api/expense/${id}`, {
     method: 'PUT',
     headers: {
       Accept: 'application/json',
@@ -174,7 +174,7 @@ export const editExpense = (id, expenseData) => {
 
 export const deleteExpense = (id) => {
   const token = localStorage.getItem('authToken');
-  fetch(`${BASE_URL}/api/expense/${id}`, {
+  return fetch(`${BASE_URL}/api/expense/${id}`, {
     method: 'DELETE',
     headers: {
       Accept: 'application/json',

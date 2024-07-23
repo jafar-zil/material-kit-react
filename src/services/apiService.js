@@ -132,3 +132,55 @@ export const deleteIncome = (id) => {
     body: null,
   }).then(handleResponse)
 };
+
+export const fetchExpenses = (payload) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/datatable/expense`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  }).then(handleResponse);
+};
+
+export const addExpense = (expenseData) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/expense`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(expenseData),
+  }).then(handleResponse);
+};
+
+export const editExpense = (id, expenseData) => {
+  const token = localStorage.getItem('authToken');
+  fetch(`${BASE_URL}/api/expense/${id}`, {
+    method: 'PUT',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(expenseData),
+  }).then(handleResponse)
+};
+
+export const deleteExpense = (id) => {
+  const token = localStorage.getItem('authToken');
+  fetch(`${BASE_URL}/api/expense/${id}`, {
+    method: 'DELETE',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: null,
+  }).then(handleResponse)
+};

@@ -24,7 +24,7 @@ const navConfig = [
   },
   {
     title: 'expense',
-    path: '/income',
+    path: '/expense',
     icon: icon('ic_expense'),
   },
   {

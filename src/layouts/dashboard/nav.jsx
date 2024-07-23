@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
+import { useEffect,useState } from 'react';
 import PropTypes from 'prop-types';
+import useLogout from 'src/hooks/useLogout';
 
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
@@ -9,6 +10,7 @@ import Avatar from '@mui/material/Avatar';
 import { alpha } from '@mui/material/styles';
 import Typography from '@mui/material/Typography';
 import ListItemButton from '@mui/material/ListItemButton';
+import CircularProgress from '@mui/material/CircularProgress';
 
 import { usePathname } from 'src/routes/hooks';
 import { RouterLink } from 'src/routes/components';
@@ -22,6 +24,7 @@ import Scrollbar from 'src/components/scrollbar';
 
 import { NAV } from './config-layout';
 import navConfig from './config-navigation';
+
 
 // ----------------------------------------------------------------------
 
@@ -165,14 +168,28 @@ Nav.propTypes = {
 // ----------------------------------------------------------------------
 
 function NavItem({ item }) {
+  const [logoutLoading, setLogoutLoading] = useState(false);
   const pathname = usePathname();
+  const handleLogout = useLogout();
 
   const active = item.path === pathname;
+  const handleClick = async (event) => {
+    event.preventDefault(); // Prevent default link behavior for logout
+    if (item.action) {
+      setLogoutLoading(true);
+      try {
+        await handleLogout();
+      } finally {
+        setLogoutLoading(false);
+      }
+    }
+  };
 
   return (
     <ListItemButton
-      component={RouterLink}
-      href={item.path}
+      component={item.action ? 'button' : RouterLink}
+      to={item.path}
+      onClick={item.action ? handleClick : undefined}
       sx={{
         minHeight: 44,
         borderRadius: 0.75,
@@ -180,6 +197,7 @@ function NavItem({ item }) {
         color: 'text.secondary',
         textTransform: 'capitalize',
         fontWeight: 'fontWeightMedium',
+        position: 'relative',
         ...(active && {
           color: 'primary.main',
           fontWeight: 'fontWeightSemiBold',
@@ -194,7 +212,22 @@ function NavItem({ item }) {
         {item.icon}
       </Box>
 
-      <Box component="span">{item.title} </Box>
+      <Box component="span" sx={{ flexGrow: 1 }}>
+        {item.title}
+      </Box>
+
+      {item.title === 'logout' && logoutLoading && (
+        <Box
+          sx={{
+            position: 'absolute',
+            right: 16,
+            top: '50%',
+            transform: 'translateY(-50%)',
+          }}
+        >
+          <CircularProgress size={18} />
+        </Box>
+      )}
     </ListItemButton>
   );
 }

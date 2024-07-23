@@ -8,7 +8,6 @@ export const ItemPage = lazy(() => import('src/pages/item'));
 export const IncomePage = lazy(() => import('src/pages/income'));
 export const LoginPage = lazy(() => import('src/pages/login'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
-export const LogoutPage = lazy(() => import('src/pages/logout'));
 
 export default function Router() {
   const { authenticated } = useAuth();
@@ -29,7 +28,6 @@ export default function Router() {
         { element: <IndexPage />, index: true },
         { path: 'item', element: <ItemPage /> },
         { path: 'income', element: <IncomePage /> },
-        { path: 'logout', element: <LogoutPage /> },
       ],
     },
     {

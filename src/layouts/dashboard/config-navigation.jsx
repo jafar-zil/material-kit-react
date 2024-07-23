@@ -29,8 +29,9 @@ const navConfig = [
   },
   {
     title: 'logout',
-    path: '/logout',
     icon: icon('ic_logout'),
+    action: async () => {
+    },
   },
 ];
 

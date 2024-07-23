@@ -20,18 +20,42 @@ export default function LoginView() {
   const navigate = useNavigate();
   const { login } = useAuth(); // Use login function from context
   
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
+  const [emailInput, setEmailInput] = useState('');
+  const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loginError, setLoginError] = useState('');
+  const [emailError, setEmailError] = useState('');
+  const [passwordError, setPasswordError] = useState('');
+
+  const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+
+  const validatePassword = (password) => password.trim().length > 0;
 
   const handleLogin = async () => {
     setLoading(true);
     setLoginError('');
+    setEmailError('');
+    setPasswordError('');
+
+    // Validate inputs
+    let isValid = true;
+    if (!validateEmail(emailInput)) {
+      setEmailError('Invalid email address');
+      isValid = false;
+    }
+    if (!validatePassword(passwordInput)) {
+      setPasswordError('Password is required');
+      isValid = false;
+    }
+
+    if (!isValid) {
+      setLoading(false);
+      return;
+    }
 
     try {
-      const data = await loginUser(email, password);
+      const data = await loginUser(emailInput, passwordInput);
       if (data.success) {
         login(data.token); // Use login function from context
         navigate('/');
@@ -51,15 +75,19 @@ export default function LoginView() {
         <TextField
           name="email"
           label="Email address"
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
+          value={emailInput}
+          onChange={(e) => setEmailInput(e.target.value)}
+          error={!!emailError}
+          helperText={emailError}
         />
         <TextField
           name="password"
           label="Password"
           type={showPassword ? 'text' : 'password'}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
+          value={passwordInput}
+          onChange={(e) => setPasswordInput(e.target.value)}
+          error={!!passwordError}
+          helperText={passwordError}
           InputProps={{
             endAdornment: (
               <InputAdornment position="end">
@@ -86,6 +114,7 @@ export default function LoginView() {
         color="inherit"
         onClick={handleLogin}
         loading={loading}
+        sx={{ mt: 2 }} 
       >
         Login
       </LoadingButton>
@@ -118,7 +147,7 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4">Sign in to Minimal</Typography>
+          <Typography variant="h4" sx={{ mb: 3, textAlign: 'center' }}>Sign in to Cashflow</Typography>
           {renderForm}
         </Card>
       </Stack>

@@ -18,6 +18,18 @@ export const loginUser = (email, password) =>
     body: JSON.stringify({ email, password }),
   }).then(handleResponse);
 
+  export const logoutUser = () => {
+    const token = localStorage.getItem('authToken');
+    return fetch(`${BASE_URL}/api/logout`, {
+      method: 'POST',
+      headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+    }).then(handleResponse);
+  };
+
 export const fetchItems = () => {
   const token = localStorage.getItem('authToken');
   return fetch(`${BASE_URL}/api/item`, {

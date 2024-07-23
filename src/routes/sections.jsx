@@ -4,13 +4,11 @@ import DashboardLayout from 'src/layouts/dashboard';
 import { useAuth } from 'src/context/AuthContext';
 
 export const IndexPage = lazy(() => import('src/pages/app'));
-export const BlogPage = lazy(() => import('src/pages/blog'));
-export const UserPage = lazy(() => import('src/pages/user'));
 export const ItemPage = lazy(() => import('src/pages/item'));
 export const IncomePage = lazy(() => import('src/pages/income'));
 export const LoginPage = lazy(() => import('src/pages/login'));
-export const ProductsPage = lazy(() => import('src/pages/products'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
+export const LogoutPage = lazy(() => import('src/pages/logout'));
 
 export default function Router() {
   const { authenticated } = useAuth();
@@ -29,11 +27,9 @@ export default function Router() {
       ),
       children: [
         { element: <IndexPage />, index: true },
-        { path: 'user', element: <UserPage /> },
         { path: 'item', element: <ItemPage /> },
         { path: 'income', element: <IncomePage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
+        { path: 'logout', element: <LogoutPage /> },
       ],
     },
     {

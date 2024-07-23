@@ -27,12 +27,6 @@ const navConfig = [
     path: '/expense',
     icon: icon('ic_expense'),
   },
-  {
-    title: 'logout',
-    icon: icon('ic_logout'),
-    action: async () => {
-    },
-  },
 ];
 
 export default navConfig;

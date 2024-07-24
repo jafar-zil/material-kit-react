@@ -1,4 +1,4 @@
-const BASE_URL = 'https://cashflow.botire.in';
+const BASE_URL = import.meta.env.API_BASE_URL;
 
 const handleResponse = async (response) => {
   if (!response.ok) {

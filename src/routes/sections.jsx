@@ -8,6 +8,7 @@ export const ItemPage = lazy(() => import('src/pages/item'));
 export const IncomePage = lazy(() => import('src/pages/income'));
 export const ExpensePage = lazy(() => import('src/pages/expense'));
 export const LoginPage = lazy(() => import('src/pages/login'));
+export const RegisterPage = lazy(() => import('src/pages/register'));
 export const Page404 = lazy(() => import('src/pages/page-not-found'));
 
 export default function Router() {
@@ -35,6 +36,10 @@ export default function Router() {
     {
       path: 'login',
       element: <LoginPage />,
+    },
+    {
+      path: 'register',
+      element: <RegisterPage />,
     },
     {
       path: '404',

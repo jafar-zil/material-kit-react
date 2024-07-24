@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import useLogout from 'src/hooks/useLogout';
 
 import Box from '@mui/material/Box';
@@ -11,9 +11,6 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 
-
-// ----------------------------------------------------------------------
-
 const MENU_OPTIONS = [
   {
     label: 'Home',
@@ -25,17 +22,20 @@ const MENU_OPTIONS = [
   },
 ];
 
-const user = JSON.parse(localStorage.getItem('user'));
-
 const photoURL = '/assets/images/avatars/avatar_14.jpg';
 
-// ----------------------------------------------------------------------
-
 export default function AccountPopover() {
+  const [user, setUser] = useState(null);
   const [open, setOpen] = useState(null);
   const [logoutLoading, setLogoutLoading] = useState(false);
   const handleLogout = useLogout();
 
+  useEffect(() => {
+    const fetchedUser = JSON.parse(localStorage.getItem('user'));
+    if (fetchedUser) {
+      setUser(fetchedUser);
+    }
+  }, []);
 
   const handleOpen = (event) => {
     setOpen(event.currentTarget);
@@ -54,8 +54,9 @@ export default function AccountPopover() {
     } finally {
       setLogoutLoading(false);
     }
-
   };
+
+  if (!user) return null; // Render nothing if user data is not available
 
   return (
     <>

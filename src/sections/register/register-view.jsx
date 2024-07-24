@@ -13,31 +13,37 @@ import { alpha, useTheme } from '@mui/material/styles';
 import Iconify from 'src/components/iconify';
 import Logo from 'src/components/logo';
 import { bgGradient } from 'src/theme/css';
-import { useAuth } from 'src/context/AuthContext'; // Import useAuth hook
-import { loginUser } from 'src/services/apiService'; 
+import { registerUser } from 'src/services/apiService'; 
+import { useAuth } from 'src/context/AuthContext';
 
-export default function LoginView() {
+export default function RegisterView() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { login } = useAuth(); // Use login function from context
+  const { login } = useAuth();
   
+  const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState(''); // New state for confirm password
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [loginError, setLoginError] = useState('');
+  const [registerError, setRegisterError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [confirmPasswordError, setConfirmPasswordError] = useState(''); // New state for confirm password error
+  const [nameError, setNameError] = useState('');
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-
   const validatePassword = (password) => password.trim().length > 0;
+  const validateName = (name) => name.trim().length > 0;
+  const validateConfirmPassword = (confirmPassword) => confirmPassword === passwordInput;
 
-  const handleLogin = async () => {
+  const handleRegister = async () => {
     setLoading(true);
-    setLoginError('');
+    setRegisterError('');
     setEmailError('');
     setPasswordError('');
+    setConfirmPasswordError(''); // Reset confirm password error
 
     // Validate inputs
     let isValid = true;
@@ -49,6 +55,14 @@ export default function LoginView() {
       setPasswordError('Password is required');
       isValid = false;
     }
+    if (!validateConfirmPassword(confirmPasswordInput)) {
+      setConfirmPasswordError('Passwords do not match');
+      isValid = false;
+    }
+    if (!validateName(nameInput)) {
+      setNameError('Name is required');
+      isValid = false;
+    }
 
     if (!isValid) {
       setLoading(false);
@@ -56,15 +70,22 @@ export default function LoginView() {
     }
 
     try {
-      const data = await loginUser(emailInput, passwordInput);
+      const payloadData = {
+        name: nameInput,
+        email: emailInput,
+        password: passwordInput,
+        password_confirmation: confirmPasswordInput,
+      };
+
+      const data = await registerUser(payloadData);
       if (data.success) {
-        login(data); // Use login function from context
+        login(data);
         navigate('/');
       } else {
-        setLoginError('Invalid email or password');
+        setRegisterError('Registration failed');
       }
     } catch (error) {
-      setLoginError(error.message || 'An error occurred. Please try again.');
+      setRegisterError(error.message || 'An error occurred. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -73,6 +94,14 @@ export default function LoginView() {
   const renderForm = (
     <>
       <Stack spacing={3}>
+        <TextField
+          name="name"
+          label="Name"
+          value={nameInput}
+          onChange={(e) => setNameInput(e.target.value)}
+          error={!!nameError}
+          helperText={nameError}
+        />
         <TextField
           name="email"
           label="Email address"
@@ -99,11 +128,29 @@ export default function LoginView() {
             ),
           }}
         />
+        <TextField
+          name="confirmPassword"
+          label="Confirm Password"
+          type={showPassword ? 'text' : 'password'}
+          value={confirmPasswordInput}
+          onChange={(e) => setConfirmPasswordInput(e.target.value)}
+          error={!!confirmPasswordError}
+          helperText={confirmPasswordError}
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton onClick={() => setShowPassword(!showPassword)} edge="end">
+                  <Iconify icon={showPassword ? 'eva:eye-fill' : 'eva:eye-off-fill'} />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+        />
       </Stack>
 
-      {loginError && (
+      {registerError && (
         <Typography color="error" variant="body2" sx={{ my: 2 }}>
-          {loginError}
+          {registerError}
         </Typography>
       )}
 
@@ -113,11 +160,11 @@ export default function LoginView() {
         type="button"
         variant="contained"
         color="inherit"
-        onClick={handleLogin}
+        onClick={handleRegister}
         loading={loading}
         sx={{ mt: 2 }} 
       >
-        Login
+        Register
       </LoadingButton>
     </>
   );
@@ -148,12 +195,12 @@ export default function LoginView() {
             maxWidth: 420,
           }}
         >
-          <Typography variant="h4" sx={{ mb: 3, textAlign: 'center' }}>Sign in to Cashflow</Typography>
+          <Typography variant="h4" sx={{ mb: 3, textAlign: 'center' }}>Sign up to Cashflow</Typography>
           {renderForm}
           <Typography variant="body2" sx={{ mt: 2, mb: 1 }}>
-            Don’t have an account?
-            <Link  href="/register" variant="subtitle2" sx={{ ml: 0.5 }}>
-              Sign Up
+            Already have an account?
+            <Link href="/login" variant="subtitle2" sx={{ ml: 0.5 }}>
+              Sign In
             </Link>
           </Typography>
         </Card>

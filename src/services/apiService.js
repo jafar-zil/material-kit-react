@@ -17,6 +17,16 @@ export const loginUser = (email, password) =>
     },
     body: JSON.stringify({ email, password }),
   }).then(handleResponse);
+  
+export const registerUser = (data) =>
+  fetch(`${BASE_URL}/api/register`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  }).then(handleResponse);
 
   export const logoutUser = () => {
     const token = localStorage.getItem('authToken');

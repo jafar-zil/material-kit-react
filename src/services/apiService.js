@@ -52,6 +52,19 @@ export const fetchItems = () => {
   }).then(handleResponse);
 };
 
+export const fetchItemsData = (payload) => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/datatable/item`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify(payload),
+  }).then(handleResponse);
+};
+
 export const addItem = (name, type) => {
   const token = localStorage.getItem('authToken');
   return fetch(`${BASE_URL}/api/item`, {

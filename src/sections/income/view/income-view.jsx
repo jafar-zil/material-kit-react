@@ -41,7 +41,6 @@ export default function IncomePage() {
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
   const [orderBy, setOrderBy] = useState('');
-  const filterName = "";
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [rowCount, setRowCount] = useState(0);
   const [open, setOpen] = useState(false);
@@ -147,7 +146,7 @@ const filterTypes = {
   };
 
 
-  const notFound = !incomes.length && !!filterName;
+  const notFound = !incomes.length && !loadingIncomes;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -319,7 +318,7 @@ const filterTypes = {
                     height={50}
                     emptyRows={emptyRows(page, rowsPerPage, rowCount)}
                   />
-                  {notFound && <TableNoData query={filterName} />}
+                  {notFound && <TableNoData/>}
                 </TableBody>
               </Table>
             </TableContainer>

@@ -1,4 +1,3 @@
-import PropTypes from 'prop-types';
 
 import Paper from '@mui/material/Paper';
 import TableRow from '@mui/material/TableRow';
@@ -7,7 +6,7 @@ import Typography from '@mui/material/Typography';
 
 // ----------------------------------------------------------------------
 
-export default function TableNoData({ query }) {
+export default function TableNoData() {
   return (
     <TableRow>
       <TableCell align="center" colSpan={6} sx={{ py: 3 }}>
@@ -16,14 +15,10 @@ export default function TableNoData({ query }) {
             textAlign: 'center',
           }}
         >
-          <Typography variant="h6" paragraph>
-            Not found
-          </Typography>
+        
 
           <Typography variant="body2">
-            No results found for &nbsp;
-            <strong>&quot;{query}&quot;</strong>.
-            <br /> Try checking for typos or using complete words.
+            Sorry! No results found
           </Typography>
         </Paper>
       </TableCell>
@@ -31,6 +26,3 @@ export default function TableNoData({ query }) {
   );
 }
 
-TableNoData.propTypes = {
-  query: PropTypes.string,
-};

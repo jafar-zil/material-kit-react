@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect,useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { fetchItems, addItem, editItem, deleteItem } from 'src/services/apiService';
+import { fetchItemsData, addItem, editItem, deleteItem } from 'src/services/apiService';
 
 import Card from '@mui/material/Card';
 import Stack from '@mui/material/Stack';
@@ -32,17 +32,15 @@ import TableNoData from '../table-no-data';
 import ItemTableRow from '../item-table-row';
 import ItemTableHead from '../item-table-head';
 import TableEmptyRows from '../table-empty-rows';
-import ItemTableToolbar from '../item-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import { emptyRows } from '../utils';
 
 export default function ItemPage() {
   const [items, setItems] = useState([]);
   const [page, setPage] = useState(0);
   const [order, setOrder] = useState('asc');
-  const [selected, setSelected] = useState([]);
   const [orderBy, setOrderBy] = useState('');
-  const [filterName, setFilterName] = useState('');
   const [rowsPerPage, setRowsPerPage] = useState(10);
+  const [rowCount, setRowCount] = useState(0);
   const [open, setOpen] = useState(false);
   const [isEditMode, setIsEditMode] = useState(false);
   const [currentItemId, setCurrentItemId] = useState(null);
@@ -54,23 +52,68 @@ export default function ItemPage() {
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [deleteItemId, setDeleteItemId] = useState(null);
   const [loadingItems, setLoadingItems] = useState(true);
-  const [loadingDelete, setLoadingDelete] = useState(false); // New state for loading delete
+  const [loadingDelete, setLoadingDelete] = useState(false);
+  const [filters, setFilters] = useState({});
 
-  const fetchItemsFromAPI = async () => {
+  const headLabel = [
+    { id: 'name', label: 'Name', filterType: 'text' },
+    { id: 'type', label: 'Type', filterType: 'autocomplete' },
+    { id: '',label: '', filterType: null  },
+  ];
+  
+  const filterTypes = {
+    name: { filterType: 'text', type: 'contains' },
+    type: { filterType: 'text', type: 'equals' },
+  };
+
+  const itemTypes = [
+    { id: 1, name: "Income" },
+    { id: 2, name: "Expense" }
+  ];
+
+  const fetchItemsFromAPI =useCallback(async (filterModel, currentPage, currentRowsPerPage, sortOrder, sortBy) => {
     setLoadingItems(true);
     try {
-      const data = await fetchItems();
-      setItems(data);
+      const startRow = currentPage * currentRowsPerPage;
+      const endRow = startRow + currentRowsPerPage;
+      const sortModel = sortBy ? [{ field: sortBy, sort: sortOrder }] : [];
+
+      const payload = {
+        startRow,
+        endRow,
+        filterModel,
+        sortModel,
+      };
+
+      const data = await fetchItemsData(payload);
+      setItems(data.rowData);
+      setRowCount(data.rowCount);
     } catch (error) {
       console.error('Failed to fetch items:', error);
     } finally {
       setLoadingItems(false);
     }
+  }, []);
+
+  const handleFilterChange = (id, value, filterType, type) => {
+    setFilters((prevFilters) => {
+      const restFilters = { ...prevFilters };
+      delete restFilters[id]; // Remove the filter if it exists
+  
+      if (value === '' || value === null) {
+        return restFilters; // Return without the removed filter
+      }
+  
+      return {
+        ...prevFilters,
+        [id]: { filter: value, filterType, type },
+      };
+    });
   };
 
   useEffect(() => {
-    fetchItemsFromAPI();
-  }, []);
+    fetchItemsFromAPI(filters, page, rowsPerPage, order, orderBy);
+  }, [filters, page, rowsPerPage, order, orderBy, fetchItemsFromAPI]);
 
   const handleSort = (event, id) => {
     const isAsc = orderBy === id && order === 'asc';
@@ -80,32 +123,8 @@ export default function ItemPage() {
     }
   };
 
-  const handleSelectAllClick = (event) => {
-    if (event.target.checked) {
-      const newSelecteds = items.map((n) => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
-    let newSelected = [];
-    if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
-    } else if (selectedIndex === 0) {
-      newSelected = newSelected.concat(selected.slice(1));
-    } else if (selectedIndex === selected.length - 1) {
-      newSelected = newSelected.concat(selected.slice(0, -1));
-    } else if (selectedIndex > 0) {
-      newSelected = newSelected.concat(
-        selected.slice(0, selectedIndex),
-        selected.slice(selectedIndex + 1)
-      );
-    }
-    setSelected(newSelected);
-  };
+
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -116,18 +135,8 @@ export default function ItemPage() {
     setRowsPerPage(parseInt(event.target.value, 10));
   };
 
-  const handleFilterByName = (event) => {
-    setPage(0);
-    setFilterName(event.target.value);
-  };
 
-  const dataFiltered = applyFilter({
-    inputData: items,
-    comparator: getComparator(order, orderBy),
-    filterName,
-  });
-
-  const notFound = !dataFiltered.length && !!filterName;
+  const notFound = !items.length && !loadingItems;
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -169,7 +178,7 @@ export default function ItemPage() {
         setSuccessMesage("Item added successfully")
       }
 
-      fetchItemsFromAPI();
+      fetchItemsFromAPI(filters, page, rowsPerPage, order, orderBy); 
       handleClose();
     } catch (error) {
       setApiError(error.message);
@@ -201,7 +210,7 @@ export default function ItemPage() {
       try {
         await deleteItem(deleteItemId);
         setSuccessMesage("Item deleted successfully")
-        fetchItemsFromAPI();
+        fetchItemsFromAPI(filters, page, rowsPerPage, order, orderBy); 
       } catch (error) {
         setApiError(error.message);
       } finally {
@@ -243,11 +252,7 @@ export default function ItemPage() {
         </Stack>
 
         <Card>
-          <ItemTableToolbar
-            numSelected={selected.length}
-            filterName={filterName}
-            onFilterName={handleFilterByName}
-          />
+          
 
 <Scrollbar>
             <TableContainer sx={{ minWidth: 300 }}>
@@ -255,15 +260,11 @@ export default function ItemPage() {
                 <ItemTableHead
                   order={order}
                   orderBy={orderBy}
-                  headLabel={[
-                    { id: 'name', label: 'Name', alignRight: false },
-                    { id: 'type', label: 'Type', alignRight: false },
-                    { id: '' },
-                  ]}
-                  rowCount={items.length}
-                  numSelected={selected.length}
-                  onSelectAllClick={handleSelectAllClick}
+                  headLabel={headLabel}
                   onRequestSort={handleSort}
+                  onFilterChange={handleFilterChange}
+                  filterTypes={filterTypes}
+                  filterOptions={itemTypes}
                 />
                 <TableBody>
                   {loadingItems ? (
@@ -278,14 +279,8 @@ export default function ItemPage() {
                     </TableCell>
                   </TableRow>
                   ) : (
-                    dataFiltered
-                      .slice(
-                        page * rowsPerPage,
-                        page * rowsPerPage + rowsPerPage
-                      )
-                      .map((row) => {
+                    items.map((row) => {
                         const { id, name, type } = row;
-                        const isItemSelected = selected.indexOf(name) !== -1;
 
                         return (
                           <ItemTableRow
@@ -293,8 +288,6 @@ export default function ItemPage() {
                             id={id}
                             name={name}
                             type={type === '1' ? 'Income' : 'Expense'}
-                            selected={isItemSelected}
-                            handleClick={(event) => handleClick(event, name)}
                             onEdit={handleEditItem}
                             onDelete={handleDeleteItem} // Pass handleDeleteItem
                           />
@@ -303,10 +296,10 @@ export default function ItemPage() {
                   )}
                   <TableEmptyRows
                     height={77}
-                    emptyRows={emptyRows(page, rowsPerPage, items.length)}
+                    emptyRows={emptyRows(page, rowsPerPage, rowCount)}
                   />
 
-                  {notFound && <TableNoData query={filterName} />}
+                  {notFound && <TableNoData/>}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -315,7 +308,7 @@ export default function ItemPage() {
           <TablePagination
             rowsPerPageOptions={[10, 25, 50]}
             component="div"
-            count={items.length}
+            count={rowCount}
             rowsPerPage={rowsPerPage}
             page={page}
             onPageChange={handleChangePage}

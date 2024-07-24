@@ -2,7 +2,6 @@ import { useState } from 'react';
 import PropTypes from 'prop-types';
 import Stack from '@mui/material/Stack';
 import TableRow from '@mui/material/TableRow';
-import Checkbox from '@mui/material/Checkbox';
 import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
@@ -14,8 +13,6 @@ ItemTableRow.propTypes = {
   id: PropTypes.number.isRequired,
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
-  selected: PropTypes.bool,
-  handleClick: PropTypes.func,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired, // Add onDelete prop
 };
@@ -24,8 +21,6 @@ export default function ItemTableRow({
   id,
   name,
   type,
-  selected,
-  handleClick,
   onEdit,
   onDelete, // Add onDelete prop
 }) {
@@ -50,10 +45,7 @@ export default function ItemTableRow({
   };
 
   return (
-    <TableRow hover selected={selected}>
-      <TableCell padding="checkbox">
-        <Checkbox checked={selected} onChange={handleClick} />
-      </TableCell>
+    <TableRow hover>
 
       <TableCell>
         <Stack direction="row" alignItems="center" spacing={2}>

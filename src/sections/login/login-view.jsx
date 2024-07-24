@@ -57,7 +57,7 @@ export default function LoginView() {
     try {
       const data = await loginUser(emailInput, passwordInput);
       if (data.success) {
-        login(data.token); // Use login function from context
+        login(data); // Use login function from context
         navigate('/');
       } else {
         setLoginError('Invalid email or password');

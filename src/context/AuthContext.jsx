@@ -10,13 +10,15 @@ export function AuthProvider({ children }) {
     return Boolean(token);
   });
 
-  const login = (token) => {
-    localStorage.setItem('authToken', token);
+  const login = (data) => {
+    localStorage.setItem('authToken', data.token);
+    localStorage.setItem('user', JSON.stringify(data.user));
     setAuthenticated(true);
   };
 
   const logout = () => {
     localStorage.removeItem('authToken');
+    localStorage.removeItem('user');
     setAuthenticated(false);
   };
 

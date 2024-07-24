@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import CircularProgress from '@mui/material/CircularProgress';
 
-import { account } from 'src/_mock/account';
 
 // ----------------------------------------------------------------------
 
@@ -24,11 +23,11 @@ const MENU_OPTIONS = [
     label: 'Profile',
     icon: 'eva:person-fill',
   },
-  {
-    label: 'Settings',
-    icon: 'eva:settings-2-fill',
-  },
 ];
+
+const user = JSON.parse(localStorage.getItem('user'));
+
+const photoURL = '/assets/images/avatars/avatar_14.jpg';
 
 // ----------------------------------------------------------------------
 
@@ -73,15 +72,15 @@ export default function AccountPopover() {
         }}
       >
         <Avatar
-          src={account.photoURL}
-          alt={account.displayName}
+          src={photoURL}
+          alt={user.name}
           sx={{
             width: 36,
             height: 36,
             border: (theme) => `solid 2px ${theme.palette.background.default}`,
           }}
         >
-          {account.displayName.charAt(0).toUpperCase()}
+          {user.name.charAt(0).toUpperCase()}
         </Avatar>
       </IconButton>
 
@@ -102,10 +101,10 @@ export default function AccountPopover() {
       >
         <Box sx={{ my: 1.5, px: 2 }}>
           <Typography variant="subtitle2" noWrap>
-            {account.displayName}
+            {user.name}
           </Typography>
           <Typography variant="body2" sx={{ color: 'text.secondary' }} noWrap>
-            {account.email}
+            {user.email}
           </Typography>
         </Box>
 

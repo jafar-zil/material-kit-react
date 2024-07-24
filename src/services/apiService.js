@@ -40,9 +40,9 @@ export const registerUser = (data) =>
     }).then(handleResponse);
   };
 
-export const fetchItems = () => {
+export const fetchItems = (type) => {
   const token = localStorage.getItem('authToken');
-  return fetch(`${BASE_URL}/api/item`, {
+  return fetch(`${BASE_URL}/api/item?type=${type}`, {
     method: 'GET',
     headers: {
       Accept: 'application/json',

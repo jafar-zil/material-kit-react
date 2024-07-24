@@ -100,7 +100,7 @@ const filterTypes = {
   }, []); // Ensure stable reference with an empty dependency array
 
   const fetchItemsFromAPI = useCallback(async () => {
-    const data = await fetchItems();
+    const data = await fetchItems(2);
     setItems(data);
   }, []); // Ensure stable reference with an empty dependency array
 

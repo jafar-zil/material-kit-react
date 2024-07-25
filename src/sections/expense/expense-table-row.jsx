@@ -1,9 +1,7 @@
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import Stack from '@mui/material/Stack';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
-import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import MenuItem from '@mui/material/MenuItem';
 import Popover from '@mui/material/Popover';
@@ -45,12 +43,9 @@ export default function ExpenseTableRow({ row, onEdit, onDelete }) {
 
   return (
     <TableRow hover>
-      <TableCell>
-        <Stack direction="row" alignItems="center" spacing={2}>
-          <Typography variant="subtitle2">{row.date}</Typography>
-        </Stack>
-      </TableCell>
 
+
+      <TableCell align="left">{row.date}</TableCell>
       <TableCell align="left">{row.amount}</TableCell>
       <TableCell align="left">{row.note}</TableCell>
       <TableCell align="left">{row.item_name}</TableCell>

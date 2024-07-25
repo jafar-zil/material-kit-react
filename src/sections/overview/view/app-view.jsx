@@ -83,7 +83,7 @@ export default function AppView() {
       >
         <Box
           sx={{
-            width: 200, // Set the width you desire
+            width: 150,
           }}
         >
           <DateRangePicker onDateRangeChange={setDateRange} />

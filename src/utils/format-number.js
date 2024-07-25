@@ -19,9 +19,16 @@ export function fPercent(number) {
 }
 
 export function fShortenNumber(number) {
-  const format = number ? numeral(number).format('0.00a') : '';
+  if (number == null || number === '') return ''; // Handle null or empty input gracefully
+  
+  // Convert the number to a string and split it into integer and fractional parts
+  const [integerPart, fractionalPart] = number.toFixed(2).split('.');
+  
+  // Use a regular expression to format the integer part in the Indian style
+  const formattedIntegerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, ',').replace(/(\d)(?=(\d{2})+\d{3},)/g, '$1,');
 
-  return result(format, '.00');
+  // Combine the formatted integer part with the fractional part
+  return `${formattedIntegerPart}.${fractionalPart}`;
 }
 
 export function fData(number) {

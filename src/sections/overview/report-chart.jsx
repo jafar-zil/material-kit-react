@@ -5,10 +5,12 @@ import Card from '@mui/material/Card';
 import CardHeader from '@mui/material/CardHeader';
 
 import Chart, { useChart } from 'src/components/chart';
+import { fShortenNumber } from 'src/utils/format-number';
+
 
 // ----------------------------------------------------------------------
 
-export default function AppWebsiteVisits({ title, subheader, chart, ...other }) {
+export default function ReportChart({ title, subheader, chart, ...other }) {
   const { labels, colors, series, options } = chart;
 
   const chartOptions = useChart({
@@ -22,16 +24,13 @@ export default function AppWebsiteVisits({ title, subheader, chart, ...other }) 
       type: series.map((i) => i.fill),
     },
     labels,
-    xaxis: {
-      type: 'datetime',
-    },
     tooltip: {
       shared: true,
       intersect: false,
       y: {
         formatter: (value) => {
           if (typeof value !== 'undefined') {
-            return `${value.toFixed(0)} visits`;
+            return `${fShortenNumber(value)}`;
           }
           return value;
         },
@@ -58,7 +57,7 @@ export default function AppWebsiteVisits({ title, subheader, chart, ...other }) 
   );
 }
 
-AppWebsiteVisits.propTypes = {
+ReportChart.propTypes = {
   chart: PropTypes.object,
   subheader: PropTypes.string,
   title: PropTypes.string,

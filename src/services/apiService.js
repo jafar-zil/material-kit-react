@@ -17,7 +17,7 @@ export const loginUser = (email, password) =>
     },
     body: JSON.stringify({ email, password }),
   }).then(handleResponse);
-  
+
 export const registerUser = (data) =>
   fetch(`${BASE_URL}/api/register`, {
     method: 'POST',
@@ -28,18 +28,40 @@ export const registerUser = (data) =>
     body: JSON.stringify(data),
   }).then(handleResponse);
 
-  export const logoutUser = () => {
-    const token = localStorage.getItem('authToken');
-    return fetch(`${BASE_URL}/api/logout`, {
-      method: 'POST',
-      headers: {
-        Accept: 'application/json',
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-    }).then(handleResponse);
-  };
-
+export const logoutUser = () => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/logout`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(handleResponse);
+};
+export const getReport = (from_date = "2020-01-01", to_date = "2050-12-31") => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/report`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+    body: JSON.stringify({ from_date, to_date }),
+  }).then(handleResponse);
+};
+export const getChartData = () => {
+  const token = localStorage.getItem('authToken');
+  return fetch(`${BASE_URL}/api/chart-data`, {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  }).then(handleResponse);
+};
 export const fetchItems = (type) => {
   const token = localStorage.getItem('authToken');
   return fetch(`${BASE_URL}/api/item?type=${type}`, {
@@ -47,7 +69,7 @@ export const fetchItems = (type) => {
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json',
-      Authorization: `Bearer ${token}`, // Dynamically retrieve the token
+      Authorization: `Bearer ${token}`,
     },
   }).then(handleResponse);
 };

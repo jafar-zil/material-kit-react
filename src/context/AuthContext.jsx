@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  // Initialize authenticated state based on localStorage
+
   const [authenticated, setAuthenticated] = useState(() => {
     const token = localStorage.getItem('authToken');
     return Boolean(token);

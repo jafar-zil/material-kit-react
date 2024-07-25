@@ -126,7 +126,7 @@ export default function AccountPopover() {
           sx={{ typography: 'body2', color: 'error.main', py: 1.5 }}
         >
           Logout
-          {logoutLoading ? <CircularProgress size={14} sx={{ marginLeft: 1 }} />  : ""}
+          {logoutLoading ? <CircularProgress size={14} sx={{ marginLeft: 1 }} /> : ""}
         </MenuItem>
       </Popover>
     </>

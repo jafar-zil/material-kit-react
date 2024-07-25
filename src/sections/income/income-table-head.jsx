@@ -10,7 +10,7 @@ IncomeTableHead.propTypes = {
   onRequestSort: PropTypes.func,
   onFilterChange: PropTypes.func,
   filterTypes: PropTypes.object,
-  filterOptions: PropTypes.array, // Options for autocomplete
+  filterOptions: PropTypes.array,
 };
 
 export default function IncomeTableHead({
@@ -20,7 +20,7 @@ export default function IncomeTableHead({
   onRequestSort,
   onFilterChange,
   filterTypes,
-  filterOptions = [], // Default to an empty array if not provided
+  filterOptions = [],
 }) {
   const [filterValues, setFilterValues] = useState({});
 
@@ -32,7 +32,7 @@ export default function IncomeTableHead({
     const filterValue = id === 'item_id' ? newValue?.id : event.target.value;
     const filterType = filterTypes[id]?.filterType || 'text';
     const filterOperation = filterTypes[id]?.type || 'contains';
-    
+
     setFilterValues(prev => ({ ...prev, [id]: filterValue }));
     onFilterChange(id, filterValue, filterType, filterOperation);
   };
@@ -104,7 +104,7 @@ export default function IncomeTableHead({
                           variant="standard"
                           size="small"
                           fullWidth
-                         placeholder='Search'
+                          placeholder='Search'
                           value={filterValues[headCell.id] || ''}
                           onChange={handleFilterChange(headCell.id)}
                           InputLabelProps={{ shrink: true }}
@@ -130,7 +130,7 @@ export default function IncomeTableHead({
                           variant="standard"
                           size="small"
                           fullWidth
-                       placeholder='Search'
+                          placeholder='Search'
                           value={filterValues[headCell.id] || ''}
                           onChange={handleFilterChange(headCell.id)}
                           InputProps={{

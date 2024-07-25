@@ -13,8 +13,8 @@ IncomeTableRow.propTypes = {
     date: PropTypes.string.isRequired,
     amount: PropTypes.string.isRequired,
     note: PropTypes.string,
-    item_id: PropTypes.string, // Adjusted prop name
-    item_name: PropTypes.string, // Adjusted prop name
+    item_id: PropTypes.string,
+    item_name: PropTypes.string,
   }).isRequired,
   onEdit: PropTypes.func.isRequired,
   onDelete: PropTypes.func.isRequired,
@@ -33,7 +33,7 @@ export default function IncomeTableRow({ row, onEdit, onDelete }) {
 
   const handleEdit = () => {
     handleClosePopover();
-    onEdit(row.id, row.date, row.amount, row.note, row.item_id); // Pass item_id to onEdit
+    onEdit(row.id, row.date, row.amount, row.note, row.item_id);
   };
 
   const handleDelete = () => {
@@ -43,7 +43,7 @@ export default function IncomeTableRow({ row, onEdit, onDelete }) {
 
   return (
     <TableRow hover>
-    
+
       <TableCell align="left">{row.date}</TableCell>
       <TableCell align="left">{row.amount}</TableCell>
       <TableCell align="left">{row.note}</TableCell>

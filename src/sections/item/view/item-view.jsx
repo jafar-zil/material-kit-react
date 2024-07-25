@@ -1,4 +1,4 @@
-import { useState, useEffect,useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { fetchItemsData, addItem, editItem, deleteItem } from 'src/services/apiService';
 
@@ -58,9 +58,9 @@ export default function ItemPage() {
   const headLabel = [
     { id: 'name', label: 'Name', filterType: 'text' },
     { id: 'type', label: 'Type', filterType: 'autocomplete' },
-    { id: '',label: '', filterType: null  },
+    { id: '', label: '', filterType: null },
   ];
-  
+
   const filterTypes = {
     name: { filterType: 'text', type: 'contains' },
     type: { filterType: 'text', type: 'equals' },
@@ -71,7 +71,7 @@ export default function ItemPage() {
     { id: 2, name: "Expense" }
   ];
 
-  const fetchItemsFromAPI =useCallback(async (filterModel, currentPage, currentRowsPerPage, sortOrder, sortBy) => {
+  const fetchItemsFromAPI = useCallback(async (filterModel, currentPage, currentRowsPerPage, sortOrder, sortBy) => {
     setLoadingItems(true);
     try {
       const startRow = currentPage * currentRowsPerPage;
@@ -98,12 +98,12 @@ export default function ItemPage() {
   const handleFilterChange = (id, value, filterType, type) => {
     setFilters((prevFilters) => {
       const restFilters = { ...prevFilters };
-      delete restFilters[id]; // Remove the filter if it exists
-  
+      delete restFilters[id];
+
       if (value === '' || value === null) {
-        return restFilters; // Return without the removed filter
+        return restFilters;
       }
-  
+
       return {
         ...prevFilters,
         [id]: { filter: value, filterType, type },
@@ -178,7 +178,7 @@ export default function ItemPage() {
         setSuccessMesage("Item added successfully")
       }
 
-      fetchItemsFromAPI(filters, page, rowsPerPage, order, orderBy); 
+      fetchItemsFromAPI(filters, page, rowsPerPage, order, orderBy);
       handleClose();
     } catch (error) {
       setApiError(error.message);
@@ -206,15 +206,15 @@ export default function ItemPage() {
 
   const handleConfirmDelete = async () => {
     if (deleteItemId) {
-      setLoadingDelete(true); // Set loading state for delete
+      setLoadingDelete(true);
       try {
         await deleteItem(deleteItemId);
         setSuccessMesage("Item deleted successfully")
-        fetchItemsFromAPI(filters, page, rowsPerPage, order, orderBy); 
+        fetchItemsFromAPI(filters, page, rowsPerPage, order, orderBy);
       } catch (error) {
         setApiError(error.message);
       } finally {
-        setLoadingDelete(false); // Reset loading state
+        setLoadingDelete(false);
         setConfirmDelete(false);
         setDeleteItemId(null);
       }
@@ -252,9 +252,9 @@ export default function ItemPage() {
         </Stack>
 
         <Card>
-          
 
-<Scrollbar>
+
+          <Scrollbar>
             <TableContainer sx={{ minWidth: 300 }}>
               <Table>
                 <ItemTableHead
@@ -269,37 +269,37 @@ export default function ItemPage() {
                 <TableBody>
                   {loadingItems ? (
                     <TableRow>
-                    <TableCell colSpan={3}>
-                      <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height={200}>
-                        <CircularProgress size={24} />
-                        <Typography variant="body2" sx={{ mt: 1 }}>
-                          Loading...
-                        </Typography>
-                      </Box>
-                    </TableCell>
-                  </TableRow>
+                      <TableCell colSpan={3}>
+                        <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height={200}>
+                          <CircularProgress size={24} />
+                          <Typography variant="body2" sx={{ mt: 1 }}>
+                            Loading...
+                          </Typography>
+                        </Box>
+                      </TableCell>
+                    </TableRow>
                   ) : (
                     items.map((row) => {
-                        const { id, name, type } = row;
+                      const { id, name, type } = row;
 
-                        return (
-                          <ItemTableRow
-                            key={id}
-                            id={id}
-                            name={name}
-                            type={type === '1' ? 'Income' : 'Expense'}
-                            onEdit={handleEditItem}
-                            onDelete={handleDeleteItem} // Pass handleDeleteItem
-                          />
-                        );
-                      })
+                      return (
+                        <ItemTableRow
+                          key={id}
+                          id={id}
+                          name={name}
+                          type={type === '1' ? 'Income' : 'Expense'}
+                          onEdit={handleEditItem}
+                          onDelete={handleDeleteItem}
+                        />
+                      );
+                    })
                   )}
                   <TableEmptyRows
                     height={77}
                     emptyRows={emptyRows(page, rowsPerPage, rowCount)}
                   />
 
-                  {notFound && <TableNoData/>}
+                  {notFound && <TableNoData />}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -354,54 +354,54 @@ export default function ItemPage() {
           </DialogActions>
         </Dialog>
 
-      <Dialog open={confirmDelete} onClose={handleCancelDelete}>
-        <DialogTitle>Confirm Delete</DialogTitle>
-        <DialogContent>
-          <Typography>Are you sure you want to delete this item?</Typography>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCancelDelete}>Cancel</Button>
-          <Button
-            onClick={handleConfirmDelete}
-            variant="contained"
-            color="error"
-            disabled={loadingDelete} // Disable button when loading
-            startIcon={loadingDelete ? <CircularProgress size={20} color="inherit" /> : null} // Add loading indicator
-          >
-            Delete
-          </Button>
-        </DialogActions>
-      </Dialog>
+        <Dialog open={confirmDelete} onClose={handleCancelDelete}>
+          <DialogTitle>Confirm Delete</DialogTitle>
+          <DialogContent>
+            <Typography>Are you sure you want to delete this item?</Typography>
+          </DialogContent>
+          <DialogActions>
+            <Button onClick={handleCancelDelete}>Cancel</Button>
+            <Button
+              onClick={handleConfirmDelete}
+              variant="contained"
+              color="error"
+              disabled={loadingDelete}
+              startIcon={loadingDelete ? <CircularProgress size={20} color="inherit" /> : null}
+            >
+              Delete
+            </Button>
+          </DialogActions>
+        </Dialog>
 
-      <Snackbar
-         open={Boolean(successMesage)}
-        autoHideDuration={3000}
-        onClose={handleSuccessClose}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
+        <Snackbar
+          open={Boolean(successMesage)}
+          autoHideDuration={3000}
           onClose={handleSuccessClose}
-          severity="success"
         >
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            onClose={handleSuccessClose}
+            severity="success"
+          >
             {successMesage}
-        </MuiAlert>
-      </Snackbar>
+          </MuiAlert>
+        </Snackbar>
 
-      <Snackbar
-        open={Boolean(apiError)}
-        autoHideDuration={3000}
-        onClose={handleErrorClose}
-      >
-        <MuiAlert
-          elevation={6}
-          variant="filled"
+        <Snackbar
+          open={Boolean(apiError)}
+          autoHideDuration={3000}
           onClose={handleErrorClose}
-          severity="error"
         >
-          {apiError}
-        </MuiAlert>
-      </Snackbar>
+          <MuiAlert
+            elevation={6}
+            variant="filled"
+            onClose={handleErrorClose}
+            severity="error"
+          >
+            {apiError}
+          </MuiAlert>
+        </Snackbar>
       </Container>
     </>
   );

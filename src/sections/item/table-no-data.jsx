@@ -15,7 +15,7 @@ export default function TableNoData() {
             textAlign: 'center',
           }}
         >
-        
+
 
           <Typography variant="body2">
             Sorry! No results found

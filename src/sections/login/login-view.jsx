@@ -13,14 +13,14 @@ import { alpha, useTheme } from '@mui/material/styles';
 import Iconify from 'src/components/iconify';
 import Logo from 'src/components/logo';
 import { bgGradient } from 'src/theme/css';
-import { useAuth } from 'src/context/AuthContext'; // Import useAuth hook
-import { loginUser } from 'src/services/apiService'; 
+import { useAuth } from 'src/context/AuthContext';
+import { loginUser } from 'src/services/apiService';
 
 export default function LoginView() {
   const theme = useTheme();
   const navigate = useNavigate();
-  const { login } = useAuth(); // Use login function from context
-  
+  const { login } = useAuth();
+
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -39,7 +39,6 @@ export default function LoginView() {
     setEmailError('');
     setPasswordError('');
 
-    // Validate inputs
     let isValid = true;
     if (!validateEmail(emailInput)) {
       setEmailError('Invalid email address');
@@ -58,7 +57,7 @@ export default function LoginView() {
     try {
       const data = await loginUser(emailInput, passwordInput);
       if (data.success) {
-        login(data); // Use login function from context
+        login(data);
         navigate('/');
       } else {
         setLoginError('Invalid email or password');
@@ -115,7 +114,7 @@ export default function LoginView() {
         color="inherit"
         onClick={handleLogin}
         loading={loading}
-        sx={{ mt: 2 }} 
+        sx={{ mt: 2 }}
       >
         Login
       </LoadingButton>
@@ -152,7 +151,7 @@ export default function LoginView() {
           {renderForm}
           <Typography variant="body2" sx={{ mt: 2, mb: 1 }}>
             Don’t have an account?
-            <Link  href="/register" variant="subtitle2" sx={{ ml: 0.5 }}>
+            <Link href="/register" variant="subtitle2" sx={{ ml: 0.5 }}>
               Sign Up
             </Link>
           </Typography>

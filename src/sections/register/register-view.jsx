@@ -13,24 +13,24 @@ import { alpha, useTheme } from '@mui/material/styles';
 import Iconify from 'src/components/iconify';
 import Logo from 'src/components/logo';
 import { bgGradient } from 'src/theme/css';
-import { registerUser } from 'src/services/apiService'; 
+import { registerUser } from 'src/services/apiService';
 import { useAuth } from 'src/context/AuthContext';
 
 export default function RegisterView() {
   const theme = useTheme();
   const navigate = useNavigate();
   const { login } = useAuth();
-  
+
   const [nameInput, setNameInput] = useState('');
   const [emailInput, setEmailInput] = useState('');
   const [passwordInput, setPasswordInput] = useState('');
-  const [confirmPasswordInput, setConfirmPasswordInput] = useState(''); // New state for confirm password
+  const [confirmPasswordInput, setConfirmPasswordInput] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [registerError, setRegisterError] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [confirmPasswordError, setConfirmPasswordError] = useState(''); // New state for confirm password error
+  const [confirmPasswordError, setConfirmPasswordError] = useState('');
   const [nameError, setNameError] = useState('');
 
   const validateEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
@@ -43,9 +43,8 @@ export default function RegisterView() {
     setRegisterError('');
     setEmailError('');
     setPasswordError('');
-    setConfirmPasswordError(''); // Reset confirm password error
+    setConfirmPasswordError('');
 
-    // Validate inputs
     let isValid = true;
     if (!validateEmail(emailInput)) {
       setEmailError('Invalid email address');
@@ -162,7 +161,7 @@ export default function RegisterView() {
         color="inherit"
         onClick={handleRegister}
         loading={loading}
-        sx={{ mt: 2 }} 
+        sx={{ mt: 2 }}
       >
         Register
       </LoadingButton>

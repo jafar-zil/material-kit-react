@@ -60,20 +60,20 @@ export default function ExpensePage() {
   const [items, setItems] = useState([]);
   const [filters, setFilters] = useState({});
 
-const headLabel = [
-  { id: 'date', label: 'Date', filterType: 'date' },
-  { id: 'amount', label: 'Amount', filterType: 'number' },
-  { id: 'note', label: 'Note', filterType: 'text' },
-  { id: 'item_id', label: 'Item', filterType: 'autocomplete' },
-  { id: '',label: '', filterType: null  },
-];
+  const headLabel = [
+    { id: 'date', label: 'Date', filterType: 'date' },
+    { id: 'amount', label: 'Amount', filterType: 'number' },
+    { id: 'note', label: 'Note', filterType: 'text' },
+    { id: 'item_id', label: 'Item', filterType: 'autocomplete' },
+    { id: '', label: '', filterType: null },
+  ];
 
-const filterTypes = {
-  amount: { filterType: 'text', type: 'contains' },
-  date: { filterType: 'text', type: 'equals' },
-  note: { filterType: 'text', type: 'contains' },
-  item_id: { filterType: 'text', type: 'equals' }
-};
+  const filterTypes = {
+    amount: { filterType: 'text', type: 'contains' },
+    date: { filterType: 'text', type: 'equals' },
+    note: { filterType: 'text', type: 'contains' },
+    item_id: { filterType: 'text', type: 'equals' }
+  };
   const fetchExpensesFromAPI = useCallback(async (filterModel, currentPage, currentRowsPerPage, sortOrder, sortBy) => {
     setLoadingExpenses(true);
     try {
@@ -88,7 +88,6 @@ const filterTypes = {
         sortModel,
       };
 
-      // console.log(payload);
       const data = await fetchExpenses(payload);
       setExpenses(data.rowData);
       setRowCount(data.rowCount);
@@ -97,22 +96,22 @@ const filterTypes = {
     } finally {
       setLoadingExpenses(false);
     }
-  }, []); // Ensure stable reference with an empty dependency array
+  }, []);
 
   const fetchItemsFromAPI = useCallback(async () => {
     const data = await fetchItems(2);
     setItems(data);
-  }, []); // Ensure stable reference with an empty dependency array
+  }, []);
 
   const handleFilterChange = (id, value, filterType, type) => {
     setFilters((prevFilters) => {
       const restFilters = { ...prevFilters };
-      delete restFilters[id]; // Remove the filter if it exists
-  
+      delete restFilters[id];
+
       if (value === '' || value === null) {
-        return restFilters; // Return without the removed filter
+        return restFilters;
       }
-  
+
       return {
         ...prevFilters,
         [id]: { filter: value, filterType, type },
@@ -165,7 +164,6 @@ const filterTypes = {
     setAmount(event.target.value);
   };
 
-  // Change the date handling to use a plain HTML input
   const handleDateChange = (event) => {
     setDate(event.target.value);
   };
@@ -191,10 +189,10 @@ const filterTypes = {
 
     try {
       const expenseData = {
-        amount: expenseAmount, // Updated key
-        date: expenseDate,     // Updated key
+        amount: expenseAmount,
+        date: expenseDate,
         item_id: selectedItem?.id,
-        note: expenseNote,     // Updated key
+        note: expenseNote,
       };
 
       if (isEditMode) {
@@ -205,7 +203,7 @@ const filterTypes = {
         setSuccessMesage('Expense added successfully');
       }
 
-      fetchExpensesFromAPI(filters, page, rowsPerPage, order, orderBy); // Pass current filters and pagination settings
+      fetchExpensesFromAPI(filters, page, rowsPerPage, order, orderBy);
       handleClose();
     } catch (error) {
       setApiError(error.message);
@@ -220,11 +218,10 @@ const filterTypes = {
     setDate(date);
     setAmount(amount);
 
-    // Convert itemId to number for comparison
     const itemIdNum = Number(itemId);
     const itemToSelect = items.find((item) => item.id === itemIdNum);
 
-    setSelectedItem(itemToSelect || null); // Set the selected item or null if not found
+    setSelectedItem(itemToSelect || null);
 
     setIsEditMode(true);
     setOpen(true);
@@ -318,7 +315,7 @@ const filterTypes = {
                     height={50}
                     emptyRows={emptyRows(page, rowsPerPage, rowCount)}
                   />
-                  {notFound && <TableNoData/>}
+                  {notFound && <TableNoData />}
                 </TableBody>
               </Table>
             </TableContainer>
@@ -338,9 +335,9 @@ const filterTypes = {
         <Dialog
           open={open}
           onClose={handleClose}
-          maxWidth="md" // or another size like "sm", "lg", "xl"
+          maxWidth="md"
           fullWidth
-          sx={{ '& .MuiDialog-paper': { width: '600px', maxWidth: '80%' } }} // Custom width styling
+          sx={{ '& .MuiDialog-paper': { width: '600px', maxWidth: '80%' } }}
         >
           <DialogTitle>{isEditMode ? 'Edit Expense' : 'Add Expense'}</DialogTitle>
           <DialogContent>
@@ -401,7 +398,7 @@ const filterTypes = {
               disabled={loading || loadingExpenses || loadingDelete}
             >
               {isEditMode ? 'Update' : 'Add'}
-              {loading ? <CircularProgress size={14} sx={{ marginLeft: 1 }} />  : ""}
+              {loading ? <CircularProgress size={14} sx={{ marginLeft: 1 }} /> : ""}
             </Button>
           </DialogActions>
         </Dialog>
@@ -412,7 +409,7 @@ const filterTypes = {
             Are you sure you want to delete this expense?
           </DialogContent>
           <DialogActions>
-            <Button onClick={handleCancelDelete}  variant="outlined">
+            <Button onClick={handleCancelDelete} variant="outlined">
               Cancel
             </Button>
             <Button
@@ -422,7 +419,7 @@ const filterTypes = {
               disabled={loadingDelete}
             >
               Delete
-              {loadingDelete ? <CircularProgress size={14} sx={{ marginLeft: 1 }} />  : ""}
+              {loadingDelete ? <CircularProgress size={14} sx={{ marginLeft: 1 }} /> : ""}
             </Button>
           </DialogActions>
         </Dialog>

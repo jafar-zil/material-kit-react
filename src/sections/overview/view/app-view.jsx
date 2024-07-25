@@ -119,11 +119,11 @@ export default function AppView() {
         <Grid xs={12} md={12} lg={12}>
           {loadingChart ? (
             <Box display="flex" flexDirection="column" alignItems="center" justifyContent="center" height={200}>
-            <CircularProgress size={24} />
-            <Typography variant="body2" sx={{ mt: 1 }}>
-              Loading...
-            </Typography>
-          </Box>
+              <CircularProgress size={24} />
+              <Typography variant="body2" sx={{ mt: 1 }}>
+                Loading...
+              </Typography>
+            </Box>
           ) : (
             <ReportChart
               title="Cash flow"

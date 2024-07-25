@@ -14,7 +14,7 @@ ItemTableRow.propTypes = {
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   onEdit: PropTypes.func.isRequired,
-  onDelete: PropTypes.func.isRequired, // Add onDelete prop
+  onDelete: PropTypes.func.isRequired,
 };
 
 export default function ItemTableRow({
@@ -22,7 +22,7 @@ export default function ItemTableRow({
   name,
   type,
   onEdit,
-  onDelete, // Add onDelete prop
+  onDelete,
 }) {
   const [openPopover, setOpenPopover] = useState(null);
 
@@ -41,7 +41,7 @@ export default function ItemTableRow({
 
   const handleDelete = () => {
     handleClosePopover();
-    onDelete(id); // Call the delete handler with the item's id
+    onDelete(id);
   };
 
   return (

@@ -113,40 +113,40 @@ export default function ExpenseTableHead({
                     case 'date':
                       return (
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
-                          <DatePicker
-                            label="Select date"
-                            value={filterValues[headCell.id] || null}
-                            onChange={(newValue) => handleFilterChange(headCell.id)(null, newValue)}
-                            format="yyyy-MM-dd"
-                            slots={{
-                              textField: (params) => (
-                                <TextField
-                                  {...params}
-                                  variant="standard"
-                                  size="small"
-                                  fullWidth
-                                  InputProps={{
-                                    ...params.InputProps,
-                                    endAdornment: (
-                                      <>
-                                        {filterValues[headCell.id] ? (
-                                          <IconButton
-                                            onClick={handleClearFilter(headCell.id)}
-                                            size="small"
-                                          >
-                                            <Iconify icon="eva:close-fill" />
-                                          </IconButton>
-                                        ) : (
-                                          params.InputProps.endAdornment
-                                        )}
-                                      </>
-                                    ),
-                                  }}
-                                />
-                              ),
-                            }}
-                          />
-                        </LocalizationProvider>
+                        <DatePicker
+                          label="Search"
+                          value={filterValues[headCell.id] || null}
+                          onChange={(newValue) => handleFilterChange(headCell.id)(null, newValue)}
+                          format="yyyy-MM-dd"
+                          slots={{
+                            textField: (params) => (
+                              <TextField
+                                {...params}
+                                variant="standard"
+                                size="small"
+                                fullWidth
+                                InputProps={{
+                                  ...params.InputProps,
+                                  endAdornment: (
+                                    <>
+                                      {filterValues[headCell.id] ? (
+                                        <IconButton
+                                          onClick={handleClearFilter(headCell.id)}
+                                          size="small"
+                                        >
+                                          <Iconify icon="eva:close-fill" />
+                                        </IconButton>
+                                      ) : (
+                                        params.InputProps.endAdornment
+                                      )}
+                                    </>
+                                  ),
+                                }}
+                              />
+                            ),
+                          }}
+                        />
+                      </LocalizationProvider>
                       );
                     default:
                       return (

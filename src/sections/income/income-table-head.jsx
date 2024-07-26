@@ -116,7 +116,7 @@ export default function IncomeTableHead({
                       return (
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
                           <DatePicker
-                            label="Select date"
+                            label="Search"
                             value={filterValues[headCell.id] || null}
                             onChange={(newValue) => handleFilterChange(headCell.id)(null, newValue)}
                             format="yyyy-MM-dd"

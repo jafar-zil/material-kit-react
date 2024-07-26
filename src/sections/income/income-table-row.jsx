@@ -44,7 +44,16 @@ export default function IncomeTableRow({ row, onEdit, onDelete }) {
   return (
     <TableRow hover>
 
-      <TableCell align="left">{row.date}</TableCell>
+      <TableCell
+        align="left"
+        sx={{
+          whiteSpace: 'nowrap',
+          overflow: 'hidden',
+          textOverflow: 'ellipsis'
+        }}
+      >
+        {row.date}
+      </TableCell>
       <TableCell align="left">{row.amount}</TableCell>
       <TableCell align="left">{row.note}</TableCell>
       <TableCell align="left">{row.item_name}</TableCell>

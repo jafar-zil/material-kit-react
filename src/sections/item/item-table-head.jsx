@@ -130,24 +130,25 @@ export default function ItemTableHead({
                           variant="standard"
                           size="small"
                           fullWidth
-                          placeholder='Search'
+                          placeholder="Search"
                           value={filterValues[headCell.id] || ''}
                           onChange={handleFilterChange(headCell.id)}
                           InputProps={{
                             endAdornment: (
                               <>
-                                {filterValues[headCell.id] && (
+                                {filterValues[headCell.id] ? (
                                   <IconButton
                                     onClick={handleClearFilter(headCell.id)}
                                     size="small"
                                   >
                                     <Iconify icon="eva:close-fill" />
                                   </IconButton>
+                                ) : (
+                                  <Iconify
+                                    icon="eva:search-fill"
+                                    sx={{ color: 'action.active', mr: 1 }}
+                                  />
                                 )}
-                                <Iconify
-                                  icon="eva:search-fill"
-                                  sx={{ color: 'action.active', mr: 1 }}
-                                />
                               </>
                             ),
                           }}

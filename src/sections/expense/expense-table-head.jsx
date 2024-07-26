@@ -1,7 +1,11 @@
 import PropTypes from 'prop-types';
 import { Box, TableRow, TableCell, TableHead, TableSortLabel, TextField, Autocomplete, IconButton } from '@mui/material';
+import { DatePicker } from '@mui/x-date-pickers';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import Iconify from 'src/components/iconify';
 import { useState } from 'react';
+import { format } from 'date-fns';
 
 ExpenseTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']),
@@ -29,12 +33,21 @@ export default function ExpenseTableHead({
   };
 
   const handleFilterChange = (id) => (event, newValue) => {
-    const filterValue = id === 'item_id' ? newValue?.id : event.target.value;
+    let filterValue = newValue;
+    if (id === "item_id") {
+      filterValue = newValue?.id;
+    } else if (id === "date") {
+      filterValue = newValue;
+    } else {
+      filterValue = event.target.value;
+    }
+
+    const formattedValue = id === "date" && filterValue ? format(filterValue, 'yyyy-MM-dd') : filterValue;
     const filterType = filterTypes[id]?.filterType || 'text';
     const filterOperation = filterTypes[id]?.type || 'contains';
 
     setFilterValues(prev => ({ ...prev, [id]: filterValue }));
-    onFilterChange(id, filterValue, filterType, filterOperation);
+    onFilterChange(id, formattedValue, filterType, filterOperation);
   };
 
   const handleClearFilter = (id) => () => {
@@ -99,30 +112,41 @@ export default function ExpenseTableHead({
                       );
                     case 'date':
                       return (
-                        <TextField
-                          type="date"
-                          variant="standard"
-                          size="small"
-                          fullWidth
-                          placeholder='Search'
-                          value={filterValues[headCell.id] || ''}
-                          onChange={handleFilterChange(headCell.id)}
-                          InputLabelProps={{ shrink: true }}
-                          InputProps={{
-                            endAdornment: (
-                              <>
-                                {filterValues[headCell.id] && (
-                                  <IconButton
-                                    onClick={handleClearFilter(headCell.id)}
-                                    size="small"
-                                  >
-                                    <Iconify icon="eva:close-fill" />
-                                  </IconButton>
-                                )}
-                              </>
-                            ),
-                          }}
-                        />
+                        <LocalizationProvider dateAdapter={AdapterDateFns}>
+                          <DatePicker
+                            label="Select date"
+                            value={filterValues[headCell.id] || null}
+                            onChange={(newValue) => handleFilterChange(headCell.id)(null, newValue)}
+                            format="yyyy-MM-dd"
+                            slots={{
+                              textField: (params) => (
+                                <TextField
+                                  {...params}
+                                  variant="standard"
+                                  size="small"
+                                  fullWidth
+                                  InputProps={{
+                                    ...params.InputProps,
+                                    endAdornment: (
+                                      <>
+                                        {filterValues[headCell.id] ? (
+                                          <IconButton
+                                            onClick={handleClearFilter(headCell.id)}
+                                            size="small"
+                                          >
+                                            <Iconify icon="eva:close-fill" />
+                                          </IconButton>
+                                        ) : (
+                                          params.InputProps.endAdornment
+                                        )}
+                                      </>
+                                    ),
+                                  }}
+                                />
+                              ),
+                            }}
+                          />
+                        </LocalizationProvider>
                       );
                     default:
                       return (
@@ -130,24 +154,25 @@ export default function ExpenseTableHead({
                           variant="standard"
                           size="small"
                           fullWidth
-                          placeholder='Search'
+                          placeholder="Search"
                           value={filterValues[headCell.id] || ''}
                           onChange={handleFilterChange(headCell.id)}
                           InputProps={{
                             endAdornment: (
                               <>
-                                {filterValues[headCell.id] && (
+                                {filterValues[headCell.id] ? (
                                   <IconButton
                                     onClick={handleClearFilter(headCell.id)}
                                     size="small"
                                   >
                                     <Iconify icon="eva:close-fill" />
                                   </IconButton>
+                                ) : (
+                                  <Iconify
+                                    icon="eva:search-fill"
+                                    sx={{ color: 'action.active', mr: 1 }}
+                                  />
                                 )}
-                                <Iconify
-                                  icon="eva:search-fill"
-                                  sx={{ color: 'action.active', mr: 1 }}
-                                />
                               </>
                             ),
                           }}

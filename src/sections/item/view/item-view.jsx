@@ -76,7 +76,7 @@ export default function ItemPage() {
     try {
       const startRow = currentPage * currentRowsPerPage;
       const endRow = startRow + currentRowsPerPage;
-      const sortModel = sortBy ? [{ field: sortBy, sort: sortOrder }] : [];
+      const sortModel = sortBy ? [{ colId: sortBy, sort: sortOrder }] : [];
 
       const payload = {
         startRow,

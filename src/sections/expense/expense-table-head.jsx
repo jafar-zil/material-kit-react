@@ -154,11 +154,23 @@ export default function ExpenseTableHead({
                                   InputLabelProps={{
                                     ...params.InputLabelProps,
                                     sx: {
-                                      fontSize: '0.8em', // Adjust font size
-                                      top: '2px', // Adjust top position of the label
-                                      transform: 'translate(14px, 8px) scale(1)', // Ensure the label is positioned correctly
+                                      fontSize: {
+                                        xs: '0.6em', // Smaller font size for mobile
+                                        sm: '0.8em', // Default font size for desktop
+                                      },
+                                      top: {
+                                        xs: '0px', // Adjust top position for mobile
+                                        sm: '2px', // Top position for desktop
+                                      },
+                                      transform: {
+                                        xs: 'translate(10px, 5px) scale(1)', // Position for mobile
+                                        sm: 'translate(14px, 8px) scale(1)',  // Position for desktop
+                                      },
                                       '&.MuiInputLabel-shrink': {
-                                        transform: 'translate(14px, -6px) scale(0.75)', // Adjust for shrunk label state
+                                        transform: {
+                                          xs: 'translate(10px, -2px) scale(0.75)', // Shrunk state for mobile
+                                          sm: 'translate(14px, -6px) scale(0.75)', // Shrunk state for desktop
+                                        },
                                       },
                                     },
                                   }}

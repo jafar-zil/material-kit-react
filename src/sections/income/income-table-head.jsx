@@ -1,8 +1,8 @@
 import PropTypes from 'prop-types';
 import { Box, TableRow, TableCell, TableHead, TableSortLabel, TextField, Autocomplete, IconButton } from '@mui/material';
-import { DatePicker } from '@mui/x-date-pickers';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
 
 import Iconify from 'src/components/iconify';
 import { useState } from 'react';
@@ -68,10 +68,10 @@ export default function IncomeTableHead({
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}
               >
-                {headCell.label}
+                <strong>{headCell.label}</strong>
               </TableSortLabel>
             ) : (
-              headCell.label
+              <strong>{headCell.label}</strong>
             )}
 
             {headCell.filterType && (
@@ -84,23 +84,61 @@ export default function IncomeTableHead({
                           options={filterOptions}
                           getOptionLabel={(option) => option.name}
                           onChange={handleFilterChange(headCell.id)}
-                          value={filterOptions.find(option => option.id === filterValues[headCell.id]) || null}
+                          value={
+                            filterOptions.find(
+                              (option) => option.id === filterValues[headCell.id]
+                            ) || null
+                          }
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder='Search'
-                              variant="standard"
+                              placeholder="Search"
+                              variant="outlined"
+                              sx={{
+                                width: {
+                                  xs: 80,
+                                  sm: 120,
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                  fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                                  padding: {
+                                    xs: '0px',
+                                    sm: '0px',
+                                  },
+                                  paddingRight: '0px',
+                                },
+                                '& .MuiInputBase-input::placeholder': {
+                                  fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                },
+                                '& .MuiInputBase-input': {
+                                  padding: {
+                                    xs: '0px',
+                                    sm: '0px',
+                                  },
+                                  height : {xs:6}
+                                },
+                              }}
                               InputProps={{
                                 ...params.InputProps,
                                 endAdornment: (
                                   <>
-                                    {filterValues[headCell.id] && (
+                                    {filterValues[headCell.id] ? (
                                       <IconButton
                                         onClick={handleClearFilter(headCell.id)}
                                         size="small"
                                       >
                                         <Iconify icon="eva:close-fill" />
                                       </IconButton>
+                                    ) : (
+                                      <Iconify
+                                        icon="eva:search-fill"
+                                        sx={{
+                                          color: 'action.active',
+                                          mr: 1,
+                                          height: { xs: '0.8rem', sm: '0.8rem' },
+                                          width: { xs: '0.8rem', sm: '0.8rem' },
+                                        }}
+                                      />
                                     )}
                                     {params.InputProps.endAdornment}
                                   </>
@@ -110,39 +148,75 @@ export default function IncomeTableHead({
                           )}
                           fullWidth
                           disableClearable
+                          forcePopupIcon={false}
                         />
                       );
                     case 'date':
                       return (
                         <LocalizationProvider dateAdapter={AdapterDateFns}>
-                          <DatePicker
+                          <DesktopDatePicker
                             label="Search"
+                            sx={{
+                              width: {
+                                xs: 100,
+                                sm: 150,
+                              },
+                            }}
                             value={filterValues[headCell.id] || null}
                             onChange={(newValue) => handleFilterChange(headCell.id)(null, newValue)}
                             format="yyyy-MM-dd"
+                            slotProps={{
+                              field: {
+                                clearable: true,
+                                onClear: () => handleClearFilter(headCell.id),
+                              },
+                            }}
                             slots={{
                               textField: (params) => (
                                 <TextField
                                   {...params}
-                                  variant="standard"
-                                  size="small"
-                                  fullWidth
                                   InputProps={{
                                     ...params.InputProps,
-                                    endAdornment: (
-                                      <>
-                                        {filterValues[headCell.id] ? (
-                                          <IconButton
-                                            onClick={handleClearFilter(headCell.id)}
-                                            size="small"
-                                          >
-                                            <Iconify icon="eva:close-fill" />
-                                          </IconButton>
-                                        ) : (
-                                          params.InputProps.endAdornment
-                                        )}
-                                      </>
-                                    ),
+                                    sx: {
+                                      '& .MuiInputBase-input': {
+                                        fontSize: { xs: '0.6rem', sm: '0.875rem' },
+                                        height: '1.5em',
+                                        padding: { sm: '6px 8px', xs: '3px 4px' },
+                                      },
+                                      '& .MuiOutlinedInput-root': {
+                                        padding: '0 8px', 
+                                      },
+                                      '& .MuiSvgIcon-root': {
+                                        fontSize: { xs: '0.6rem', sm: '1rem' },
+                                        marginRight: '0px',
+                                      },
+                                      '& .MuiIconButton-root': {
+                                        padding: '2px',
+                                      },
+                                    },
+                                  }}
+                                  InputLabelProps={{
+                                    ...params.InputLabelProps,
+                                    sx: {
+                                      fontSize: {
+                                        xs: '0.6em',
+                                        sm: '0.8em',
+                                      },
+                                      top: {
+                                        xs: '0px',
+                                        sm: '2px',
+                                      },
+                                      transform: {
+                                        xs: 'translate(5px, 4px) scale(1)',
+                                        sm: 'translate(8px, 6px) scale(1)',
+                                      },
+                                      '&.MuiInputLabel-shrink': {
+                                        transform: {
+                                          xs: 'translate(10px, -2px) scale(0.75)',
+                                          sm: 'translate(14px, -6px) scale(0.75)',
+                                        },
+                                      },
+                                    },
                                   }}
                                 />
                               ),
@@ -153,9 +227,27 @@ export default function IncomeTableHead({
                     default:
                       return (
                         <TextField
-                          variant="standard"
+                          variant="outlined"
                           size="small"
-                          fullWidth
+                          sx={{
+                            width: {
+                              xs: 70,
+                              sm: 110,
+                            },
+                            '& .MuiOutlinedInput-root': {
+                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                              padding: {
+                                xs: '0px',
+                                sm: '0px',
+                              },
+                            },
+                            '& .MuiInputBase-input::placeholder': {
+                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                            },
+                            '& .MuiInputBase-input': {
+                              padding: { sm: '6px 8px', xs: '3px 4px' }
+                            },
+                          }}
                           placeholder="Search"
                           value={filterValues[headCell.id] || ''}
                           onChange={handleFilterChange(headCell.id)}
@@ -163,10 +255,7 @@ export default function IncomeTableHead({
                             endAdornment: (
                               <>
                                 {filterValues[headCell.id] ? (
-                                  <IconButton
-                                    onClick={handleClearFilter(headCell.id)}
-                                    size="small"
-                                  >
+                                  <IconButton onClick={handleClearFilter(headCell.id)} size="small">
                                     <Iconify icon="eva:close-fill" />
                                   </IconButton>
                                 ) : (

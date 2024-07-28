@@ -27,7 +27,6 @@ export default function ItemTableHead({
   const createSortHandler = (id) => (event) => {
     onRequestSort(event, id);
   };
-  console.log(filterOptions);
   const handleFilterChange = (id) => (event, newValue) => {
     const filterValue = id === 'type' ? newValue?.id : event.target.value;
     const filterType = filterTypes[id]?.filterType || 'text';
@@ -53,7 +52,7 @@ export default function ItemTableHead({
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}
               >
-                {headCell.label}
+                 <strong>{headCell.label}</strong>
               </TableSortLabel>
             ) : (
               headCell.label
@@ -69,23 +68,61 @@ export default function ItemTableHead({
                           options={filterOptions}
                           getOptionLabel={(option) => option.name}
                           onChange={handleFilterChange(headCell.id)}
-                          value={filterOptions.find(option => option.id === filterValues[headCell.id]) || null}
+                          value={
+                            filterOptions.find(
+                              (option) => option.id === filterValues[headCell.id]
+                            ) || null
+                          }
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder='Search'
-                              variant="standard"
+                              placeholder="Search"
+                              variant="outlined"
+                              sx={{
+                                width: {
+                                  xs: 80,
+                                  sm: 120,
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                  fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                                  padding: {
+                                    xs: '0px',
+                                    sm: '0px',
+                                  },
+                                  paddingRight: '0px',
+                                },
+                                '& .MuiInputBase-input::placeholder': {
+                                  fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                },
+                                '& .MuiInputBase-input': {
+                                  padding: {
+                                    xs: '0px',
+                                    sm: '0px',
+                                  },
+                                  height : {xs:6}
+                                },
+                              }}
                               InputProps={{
                                 ...params.InputProps,
                                 endAdornment: (
                                   <>
-                                    {filterValues[headCell.id] && (
+                                    {filterValues[headCell.id] ? (
                                       <IconButton
                                         onClick={handleClearFilter(headCell.id)}
                                         size="small"
                                       >
                                         <Iconify icon="eva:close-fill" />
                                       </IconButton>
+                                    ) : (
+                                      <Iconify
+                                        icon="eva:search-fill"
+                                        sx={{
+                                          color: 'action.active',
+                                          mr: 1,
+                                          height: { xs: '0.8rem', sm: '0.8rem' },
+                                          width: { xs: '0.8rem', sm: '0.8rem' },
+                                        }}
+                                      />
                                     )}
                                     {params.InputProps.endAdornment}
                                   </>
@@ -95,41 +132,33 @@ export default function ItemTableHead({
                           )}
                           fullWidth
                           disableClearable
-                        />
-                      );
-                    case 'date':
-                      return (
-                        <TextField
-                          type="date"
-                          variant="standard"
-                          size="small"
-                          fullWidth
-                          placeholder='Search'
-                          value={filterValues[headCell.id] || ''}
-                          onChange={handleFilterChange(headCell.id)}
-                          InputLabelProps={{ shrink: true }}
-                          InputProps={{
-                            endAdornment: (
-                              <>
-                                {filterValues[headCell.id] && (
-                                  <IconButton
-                                    onClick={handleClearFilter(headCell.id)}
-                                    size="small"
-                                  >
-                                    <Iconify icon="eva:close-fill" />
-                                  </IconButton>
-                                )}
-                              </>
-                            ),
-                          }}
+                          forcePopupIcon={false}
                         />
                       );
                     default:
                       return (
                         <TextField
-                          variant="standard"
+                          variant="outlined"
                           size="small"
-                          fullWidth
+                          sx={{
+                            width: {
+                              xs: 70,
+                              sm: 110,
+                            },
+                            '& .MuiOutlinedInput-root': {
+                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                              padding: {
+                                xs: '0px',
+                                sm: '0px',
+                              },
+                            },
+                            '& .MuiInputBase-input::placeholder': {
+                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                            },
+                            '& .MuiInputBase-input': {
+                              padding: { sm: '6px 8px', xs: '3px 4px' }
+                            },
+                          }}
                           placeholder="Search"
                           value={filterValues[headCell.id] || ''}
                           onChange={handleFilterChange(headCell.id)}
@@ -137,10 +166,7 @@ export default function ItemTableHead({
                             endAdornment: (
                               <>
                                 {filterValues[headCell.id] ? (
-                                  <IconButton
-                                    onClick={handleClearFilter(headCell.id)}
-                                    size="small"
-                                  >
+                                  <IconButton onClick={handleClearFilter(headCell.id)} size="small">
                                     <Iconify icon="eva:close-fill" />
                                   </IconButton>
                                 ) : (

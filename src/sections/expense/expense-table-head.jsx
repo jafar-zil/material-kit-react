@@ -81,10 +81,10 @@ export default function ExpenseTableHead({
                 direction={orderBy === headCell.id ? order : 'asc'}
                 onClick={createSortHandler(headCell.id)}
               >
-                {headCell.label}
+                 <strong>{headCell.label}</strong>
               </TableSortLabel>
             ) : (
-              headCell.label
+              <strong>{headCell.label}</strong>
             )}
 
             {headCell.filterType && (
@@ -171,8 +171,8 @@ export default function ExpenseTableHead({
                             label="Search"
                             sx={{
                               width: {
-                                xs: 100, // Width for extra-small screens (mobile)
-                                sm: 150, // Width for small screens and above (desktop)
+                                xs: 100,
+                                sm: 150,
                               },
                             }}
                             value={filterValues[headCell.id] || null}
@@ -194,17 +194,17 @@ export default function ExpenseTableHead({
                                       '& .MuiInputBase-input': {
                                         fontSize: { xs: '0.6rem', sm: '0.875rem' },
                                         height: '1.5em',
-                                        padding: { sm: '6px 8px', xs: '3px 4px' }, // Adjust padding to ensure proper spacing
+                                        padding: { sm: '6px 8px', xs: '3px 4px' },
                                       },
                                       '& .MuiOutlinedInput-root': {
-                                        padding: '0 8px', // Ensure outer padding aligns with input
+                                        padding: '0 8px', 
                                       },
                                       '& .MuiSvgIcon-root': {
-                                        fontSize: { xs: '0.6rem', sm: '1rem' }, // Adjust icon size
-                                        marginRight: '0px', // Reduce margin between icon and text
+                                        fontSize: { xs: '0.6rem', sm: '1rem' },
+                                        marginRight: '0px',
                                       },
                                       '& .MuiIconButton-root': {
-                                        padding: '2px', // Adjust icon size
+                                        padding: '2px',
                                       },
                                     },
                                   }}
@@ -212,21 +212,21 @@ export default function ExpenseTableHead({
                                     ...params.InputLabelProps,
                                     sx: {
                                       fontSize: {
-                                        xs: '0.6em', // Smaller font size for mobile
-                                        sm: '0.8em', // Default font size for desktop
+                                        xs: '0.6em',
+                                        sm: '0.8em',
                                       },
                                       top: {
-                                        xs: '0px', // Adjust top position for mobile
-                                        sm: '2px', // Top position for desktop
+                                        xs: '0px',
+                                        sm: '2px',
                                       },
                                       transform: {
-                                        xs: 'translate(5px, 4px) scale(1)', // Position for mobile
-                                        sm: 'translate(8px, 6px) scale(1)', // Position for desktop
+                                        xs: 'translate(5px, 4px) scale(1)',
+                                        sm: 'translate(8px, 6px) scale(1)',
                                       },
                                       '&.MuiInputLabel-shrink': {
                                         transform: {
-                                          xs: 'translate(10px, -2px) scale(0.75)', // Shrunk state for mobile
-                                          sm: 'translate(14px, -6px) scale(0.75)', // Shrunk state for desktop
+                                          xs: 'translate(10px, -2px) scale(0.75)',
+                                          sm: 'translate(14px, -6px) scale(0.75)',
                                         },
                                       },
                                     },

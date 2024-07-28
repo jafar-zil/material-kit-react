@@ -1,5 +1,14 @@
 import PropTypes from 'prop-types';
-import { Box, TableRow, TableCell, TableHead, TableSortLabel, TextField, Autocomplete, IconButton } from '@mui/material';
+import {
+  Box,
+  TableRow,
+  TableCell,
+  TableHead,
+  TableSortLabel,
+  TextField,
+  Autocomplete,
+  IconButton,
+} from '@mui/material';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
 import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
@@ -34,25 +43,31 @@ export default function ExpenseTableHead({
 
   const handleFilterChange = (id) => (event, newValue) => {
     let filterValue = newValue;
-    if (id === "item_id") {
+    if (id === 'item_id') {
       filterValue = newValue?.id;
-    } else if (id === "date") {
+    } else if (id === 'date') {
       filterValue = newValue;
     } else {
       filterValue = event.target.value;
     }
 
-    const formattedValue = id === "date" && filterValue ? format(filterValue, 'yyyy-MM-dd') : filterValue;
+    const formattedValue =
+      id === 'date' && filterValue ? format(filterValue, 'yyyy-MM-dd') : filterValue;
     const filterType = filterTypes[id]?.filterType || 'text';
     const filterOperation = filterTypes[id]?.type || 'contains';
 
-    setFilterValues(prev => ({ ...prev, [id]: filterValue }));
+    setFilterValues((prev) => ({ ...prev, [id]: filterValue }));
     onFilterChange(id, formattedValue, filterType, filterOperation);
   };
 
   const handleClearFilter = (id) => () => {
-    setFilterValues(prev => ({ ...prev, [id]: '' }));
-    onFilterChange(id, '', filterTypes[id]?.filterType || 'text', filterTypes[id]?.type || 'contains');
+    setFilterValues((prev) => ({ ...prev, [id]: '' }));
+    onFilterChange(
+      id,
+      '',
+      filterTypes[id]?.filterType || 'text',
+      filterTypes[id]?.type || 'contains'
+    );
   };
 
   return (
@@ -82,23 +97,60 @@ export default function ExpenseTableHead({
                           options={filterOptions}
                           getOptionLabel={(option) => option.name}
                           onChange={handleFilterChange(headCell.id)}
-                          value={filterOptions.find(option => option.id === filterValues[headCell.id]) || null}
+                          value={
+                            filterOptions.find(
+                              (option) => option.id === filterValues[headCell.id]
+                            ) || null
+                          }
                           renderInput={(params) => (
                             <TextField
                               {...params}
-                              placeholder='Search'
-                              variant="standard"
+                              placeholder="Search"
+                              variant="outlined"
+                              sx={{
+                                width: {
+                                  xs: 80,
+                                  sm: 120,
+                                },
+                                '& .MuiOutlinedInput-root': {
+                                  fontSize: { xs: '0.6rem', sm: '0.65rem' },
+                                  padding: {
+                                    xs: '0px',
+                                    sm: '0px',
+                                  },
+                                  paddingRight: '0px',
+                                },
+                                '& .MuiInputBase-input::placeholder': {
+                                  fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                                },
+                                '& .MuiInputBase-input': {
+                                  padding: {
+                                    xs: '2px',
+                                    sm: '6px 12px',
+                                  },
+                                },
+                              }}
                               InputProps={{
                                 ...params.InputProps,
                                 endAdornment: (
                                   <>
-                                    {filterValues[headCell.id] && (
+                                    {filterValues[headCell.id] ? (
                                       <IconButton
                                         onClick={handleClearFilter(headCell.id)}
                                         size="small"
                                       >
                                         <Iconify icon="eva:close-fill" />
                                       </IconButton>
+                                    ) : (
+                                      <Iconify
+                                        icon="eva:search-fill"
+                                        sx={{
+                                          color: 'action.active',
+                                          mr: 1,
+                                          height: { xs: '0.8rem', sm: '0.8rem' },
+                                          width: { xs: '0.8rem', sm: '0.8rem' },
+                                        }}
+                                      />
                                     )}
                                     {params.InputProps.endAdornment}
                                   </>
@@ -108,6 +160,7 @@ export default function ExpenseTableHead({
                           )}
                           fullWidth
                           disableClearable
+                          forcePopupIcon={false}
                         />
                       );
                     case 'date':
@@ -117,15 +170,18 @@ export default function ExpenseTableHead({
                             label="Search"
                             sx={{
                               width: {
-                                xs: 100,  // Width for extra-small screens (mobile)
-                                sm: 150,  // Width for small screens and above (desktop)
+                                xs: 100, // Width for extra-small screens (mobile)
+                                sm: 150, // Width for small screens and above (desktop)
                               },
                             }}
                             value={filterValues[headCell.id] || null}
                             onChange={(newValue) => handleFilterChange(headCell.id)(null, newValue)}
                             format="yyyy-MM-dd"
                             slotProps={{
-                              field: { clearable: true, onClear: () => handleClearFilter(headCell.id) },
+                              field: {
+                                clearable: true,
+                                onClear: () => handleClearFilter(headCell.id),
+                              },
                             }}
                             slots={{
                               textField: (params) => (
@@ -135,15 +191,15 @@ export default function ExpenseTableHead({
                                     ...params.InputProps,
                                     sx: {
                                       '& .MuiInputBase-input': {
-                                        fontSize: {xs : '0.6rem',sm : '0.875rem'},
+                                        fontSize: { xs: '0.6rem', sm: '0.875rem' },
                                         height: '1.5em',
-                                        padding: {sm :'6px 8px',xs: '3px 4px'}, // Adjust padding to ensure proper spacing
+                                        padding: { sm: '6px 8px', xs: '3px 4px' }, // Adjust padding to ensure proper spacing
                                       },
                                       '& .MuiOutlinedInput-root': {
                                         padding: '0 8px', // Ensure outer padding aligns with input
                                       },
                                       '& .MuiSvgIcon-root': {
-                                        fontSize: {xs : '0.6rem',sm : '1rem'}, // Adjust icon size
+                                        fontSize: { xs: '0.6rem', sm: '1rem' }, // Adjust icon size
                                         marginRight: '0px', // Reduce margin between icon and text
                                       },
                                       '& .MuiIconButton-root': {
@@ -164,7 +220,7 @@ export default function ExpenseTableHead({
                                       },
                                       transform: {
                                         xs: 'translate(10px, 5px) scale(1)', // Position for mobile
-                                        sm: 'translate(14px, 8px) scale(1)',  // Position for desktop
+                                        sm: 'translate(14px, 8px) scale(1)', // Position for desktop
                                       },
                                       '&.MuiInputLabel-shrink': {
                                         transform: {
@@ -175,7 +231,7 @@ export default function ExpenseTableHead({
                                     },
                                   }}
                                 />
-                              )
+                              ),
                             }}
                           />
                         </LocalizationProvider>
@@ -183,9 +239,30 @@ export default function ExpenseTableHead({
                     default:
                       return (
                         <TextField
-                          variant="standard"
+                          variant="outlined"
                           size="small"
-                          fullWidth
+                          sx={{
+                            width: {
+                              xs: 70,
+                              sm: 110,
+                            },
+                            '& .MuiOutlinedInput-root': {
+                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                              padding: {
+                                xs: '0px',
+                                sm: '0px',
+                              },
+                            },
+                            '& .MuiInputBase-input::placeholder': {
+                              fontSize: { xs: '0.6rem', sm: '0.75rem' },
+                            },
+                            '& .MuiInputBase-input': {
+                              padding: {
+                                xs: '2px',
+                                sm: '6px 12px',
+                              },
+                            },
+                          }}
                           placeholder="Search"
                           value={filterValues[headCell.id] || ''}
                           onChange={handleFilterChange(headCell.id)}
@@ -193,10 +270,7 @@ export default function ExpenseTableHead({
                             endAdornment: (
                               <>
                                 {filterValues[headCell.id] ? (
-                                  <IconButton
-                                    onClick={handleClearFilter(headCell.id)}
-                                    size="small"
-                                  >
+                                  <IconButton onClick={handleClearFilter(headCell.id)} size="small">
                                     <Iconify icon="eva:close-fill" />
                                   </IconButton>
                                 ) : (

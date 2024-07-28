@@ -125,9 +125,10 @@ export default function ExpenseTableHead({
                                 },
                                 '& .MuiInputBase-input': {
                                   padding: {
-                                    xs: '2px',
-                                    sm: '6px 12px',
+                                    xs: '0px',
+                                    sm: '0px',
                                   },
+                                  height : {xs:6}
                                 },
                               }}
                               InputProps={{
@@ -219,7 +220,7 @@ export default function ExpenseTableHead({
                                         sm: '2px', // Top position for desktop
                                       },
                                       transform: {
-                                        xs: 'translate(4px, 3px) scale(1)', // Position for mobile
+                                        xs: 'translate(5px, 4px) scale(1)', // Position for mobile
                                         sm: 'translate(8px, 6px) scale(1)', // Position for desktop
                                       },
                                       '&.MuiInputLabel-shrink': {

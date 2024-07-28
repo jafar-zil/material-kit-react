@@ -219,8 +219,8 @@ export default function ExpenseTableHead({
                                         sm: '2px', // Top position for desktop
                                       },
                                       transform: {
-                                        xs: 'translate(10px, 5px) scale(1)', // Position for mobile
-                                        sm: 'translate(14px, 8px) scale(1)', // Position for desktop
+                                        xs: 'translate(4px, 3px) scale(1)', // Position for mobile
+                                        sm: 'translate(8px, 6px) scale(1)', // Position for desktop
                                       },
                                       '&.MuiInputLabel-shrink': {
                                         transform: {
@@ -257,10 +257,7 @@ export default function ExpenseTableHead({
                               fontSize: { xs: '0.6rem', sm: '0.75rem' },
                             },
                             '& .MuiInputBase-input': {
-                              padding: {
-                                xs: '2px',
-                                sm: '6px 12px',
-                              },
+                              padding: { sm: '6px 8px', xs: '3px 4px' }
                             },
                           }}
                           placeholder="Search"

@@ -28,6 +28,10 @@ import MuiAlert from '@mui/material/Alert';
 import TableRow from '@mui/material/TableRow';
 import TableCell from '@mui/material/TableCell';
 import Autocomplete from '@mui/material/Autocomplete';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+import { DesktopDatePicker } from '@mui/x-date-pickers/DesktopDatePicker';
+import { format } from 'date-fns';
 import Iconify from 'src/components/iconify';
 import Scrollbar from 'src/components/scrollbar';
 import TableNoData from '../table-no-data';
@@ -54,7 +58,8 @@ export default function IncomePage() {
   const [loadingIncomes, setLoadingIncomes] = useState(true);
   const [loadingDelete, setLoadingDelete] = useState(false);
   const [incomeAmount, setAmount] = useState('');
-  const [incomeDate, setDate] = useState('');
+  const [incomeDate, setIncomeDate] = useState('');
+  const [dateValue, setDateValue] = useState('');
   const [incomeNote, setNote] = useState('');
   const [selectedItem, setSelectedItem] = useState(null);
   const [items, setItems] = useState([]);
@@ -151,7 +156,9 @@ export default function IncomePage() {
     setOpen(true);
     setIsEditMode(false);
     setNote('');
-    setDate('');
+    setDateValue(new Date());
+    const formattedDate = format(new Date(), 'yyyy-MM-dd');
+    setIncomeDate(formattedDate);
     setAmount('');
   };
 
@@ -164,8 +171,10 @@ export default function IncomePage() {
     setAmount(event.target.value);
   };
 
-  const handleDateChange = (event) => {
-    setDate(event.target.value);
+  const handleDateChange = (value) => {
+    const formattedDate = format(value, 'yyyy-MM-dd');
+    setIncomeDate( formattedDate);
+    setDateValue( value);
   };
 
   const handleNoteChange = (event) => {
@@ -215,7 +224,8 @@ export default function IncomePage() {
   const handleEditIncome = (id, date, amount, note, itemId) => {
     setCurrentIncomeId(id);
     setNote(note);
-    setDate(date);
+    setIncomeDate(date);
+    setDateValue(new Date(date));
     setAmount(amount);
 
     const itemIdNum = Number(itemId);
@@ -352,19 +362,15 @@ export default function IncomePage() {
                 value={incomeAmount}
                 onChange={handleAmountChange}
               />
-              <TextField
-                margin="dense"
-                id="date"
-                label="Date"
-                type="date"
-                fullWidth
-                variant="outlined"
-                value={incomeDate}
-                onChange={handleDateChange}
-                InputLabelProps={{
-                  shrink: true,
-                }}
-              />
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                <DesktopDatePicker
+                  label="Date"
+                  fullWidth
+                  value={dateValue || null}
+                  onChange={handleDateChange}
+                  format="yyyy-MM-dd"
+                  />
+                  </LocalizationProvider>
               <TextField
                 margin="dense"
                 id="note"
